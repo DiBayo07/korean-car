@@ -1,0 +1,43 @@
+@import "tailwindcss";
+
+@layer base {
+  body {
+    @apply bg-slate-950 text-slate-100 font-sans antialiased;
+    background-color: #0a0d14;
+  }
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: #0a0d14;
+}
+::-webkit-scrollbar-thumb {
+  background: #1f293d;
+  border-radius: 5px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #1b439c;
+}
+
+/* Wavy separator */
+.wavy-separator {
+  position: relative;
+  height: 50px;
+  background-color: #0a0d14;
+}
+
+/* Glassmorphism utility */
+.glass-panel {
+  background: rgba(21, 27, 38, 0.7);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+/* Premium smooth animations */
+.transition-all-300 {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
