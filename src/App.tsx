@@ -33,9 +33,10 @@ function App() {
     setLoading(true);
     try {
       const data = await getVehicles();
-      setVehicles(data);
+      setVehicles(Array.isArray(data) ? data : []);
     } catch (e) {
       console.error(e);
+      setVehicles([]);
     } finally {
       setLoading(false);
     }

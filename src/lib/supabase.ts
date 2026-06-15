@@ -259,18 +259,22 @@ const DEFAULT_BIKES: Vehicle[] = [
 ];
 
 const getLocalStorageVehicles = (): Vehicle[] => {
-  const data = localStorage.getItem('kg_motors_vehicles');
-  if (data) {
-    try {
-      return JSON.parse(data);
-    } catch (e) {
-      console.error(e);
+  try {
+    const data = localStorage.getItem('kg_motors_vehicles');
+    if (data) {
+      const parsed = JSON.parse(data);
+      if (Array.isArray(parsed) && parsed.length > 0) {
+        return parsed;
+      }
     }
+  } catch (e) {
+    console.error('Failed to parse localStorage vehicles:', e);
   }
   const all = [...DEFAULT_CARS, ...DEFAULT_BIKES];
   localStorage.setItem('kg_motors_vehicles', JSON.stringify(all));
   return all;
 };
+
 
 // Functions to query database (with LocalStorage fallback)
 export const getVehicles = async (): Promise<Vehicle[]> => {
