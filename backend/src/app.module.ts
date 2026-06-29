@@ -23,12 +23,19 @@ import { EncarModule } from './encar/encar.module';
     }),
     CacheModule.registerAsync({
       isGlobal: true,
-      useFactory: async () => ({
-        store: await redisStore({
-          host: process.env.REDIS_HOST || 'localhost',
-          port: parseInt(process.env.REDIS_PORT || '6379', 10),
-        }),
-      }),
+      useFactory: async () => {
+        if (process.env.REDIS_HOST) {
+          return {
+            store: await redisStore({
+              host: process.env.REDIS_HOST,
+              port: parseInt(process.env.REDIS_PORT || '6379', 10),
+            }),
+          };
+        }
+        return {
+          // Defaults to in-memory cache
+        };
+      },
     }),
     EncarModule,
   ],
