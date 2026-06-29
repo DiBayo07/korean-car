@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Globe, ChevronDown, Check, Menu, X, PlusCircle, Car, Bike } from 'lucide-react';
+import { Globe, ChevronDown, Check, Menu, X, Car, Bike } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import type { Language, TranslationDict } from '../lib/translations';
 
@@ -8,8 +8,6 @@ interface HeaderProps {
   currentLang: Language;
   setLang: (lang: Language) => void;
   t: TranslationDict;
-  isAdmin: boolean;
-  setIsAdmin: (val: boolean) => void;
   onHomeClick?: () => void;
 }
 
@@ -17,8 +15,6 @@ export const Header: React.FC<HeaderProps> = ({
   currentLang,
   setLang,
   t,
-  isAdmin,
-  setIsAdmin,
   onHomeClick,
 }) => {
   const [desktopDropdownOpen, setDesktopDropdownOpen] = useState(false);
@@ -181,13 +177,6 @@ export const Header: React.FC<HeaderProps> = ({
           >
             {t.navContact}
           </button>
-          <button 
-            onClick={() => setIsAdmin(true)} 
-            className={`text-sm font-semibold tracking-wide flex items-center gap-1.5 px-3 py-1 rounded-md border transition-all ${isAdmin ? 'bg-kg-gold/15 text-kg-gold border-kg-gold/30' : 'text-slate-400 hover:text-slate-200 border-white/5 hover:border-white/10'}`}
-          >
-            <PlusCircle size={14} />
-            {t.navAdmin}
-          </button>
         </nav>
 
         {/* Desktop Controls (Lang Switcher & Call Action) */}
@@ -325,16 +314,6 @@ export const Header: React.FC<HeaderProps> = ({
               className="block w-full text-left py-2 px-3 rounded-lg text-sm font-semibold text-slate-300 hover:bg-white/5"
             >
               {t.navContact}
-            </button>
-            <button
-              onClick={() => {
-                setIsAdmin(true);
-                setMobileMenuOpen(false);
-              }}
-              className={`block w-full text-left py-2 px-3 rounded-lg text-sm font-bold flex items-center gap-2 ${isAdmin ? 'bg-kg-gold/15 text-kg-gold' : 'text-slate-300 hover:bg-white/5'}`}
-            >
-              <PlusCircle size={16} />
-              {t.navAdmin}
             </button>
             <div className="pt-2 border-t border-white/5">
               <button

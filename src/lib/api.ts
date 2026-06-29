@@ -24,7 +24,7 @@ export interface Vehicle {
   inspectionAvailable?: boolean;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://13.63.165.49:3000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://13-63-165-49.sslip.io/api';
 
 export const getVehicles = async (filters: any = {}): Promise<Vehicle[]> => {
   try {

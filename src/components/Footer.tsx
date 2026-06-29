@@ -5,12 +5,10 @@ import type { TranslationDict } from '../lib/translations';
 interface FooterProps {
   t: TranslationDict;
   setActiveSection: (section: string) => void;
-  setIsAdmin: (val: boolean) => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ t, setActiveSection, setIsAdmin }) => {
+export const Footer: React.FC<FooterProps> = ({ t, setActiveSection }) => {
   const handleNavClick = (sectionId: string) => {
-    setIsAdmin(false);
     setActiveSection(sectionId);
     
     if (sectionId === 'home') {
@@ -141,11 +139,7 @@ export const Footer: React.FC<FooterProps> = ({ t, setActiveSection, setIsAdmin 
                 {t.navContact}
               </button>
             </li>
-            <li>
-              <button onClick={() => setIsAdmin(true)} className="hover:text-white transition-colors font-bold text-kg-gold">
-                {t.navAdmin}
-              </button>
-            </li>
+
           </ul>
         </div>
 

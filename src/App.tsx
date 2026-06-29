@@ -6,7 +6,7 @@ import { CarsSection } from './components/CarsSection';
 import { BikesSection } from './components/BikesSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
-import { AdminPanel } from './components/AdminPanel';
+
 import { CarsPage } from './pages/CarsPage';
 import { BikesPage } from './pages/BikesPage';
 import { CarDetailsPage } from './pages/CarDetailsPage';
@@ -26,7 +26,7 @@ function ScrollToTop() {
 
 function App() {
   const [lang, setLang] = useState<Language>('ru');
-  const [isAdmin, setIsAdmin] = useState(false);
+
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   
@@ -98,9 +98,7 @@ function App() {
     );
   }
 
-  if (isAdmin) {
-    return <AdminPanel onBack={() => setIsAdmin(false)} />;
-  }
+
 
   // Home page content
   const HomePage = () => (
@@ -270,8 +268,6 @@ function App() {
         currentLang={lang}
         setLang={setLang}
         t={t}
-        isAdmin={isAdmin}
-        setIsAdmin={setIsAdmin}
         onHomeClick={clearSearch}
       />
 
@@ -287,7 +283,6 @@ function App() {
       <Footer
         t={t}
         setActiveSection={() => {}}
-        setIsAdmin={setIsAdmin}
       />
     </div>
   );
