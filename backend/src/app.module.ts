@@ -1,6 +1,6 @@
 import { Module } from '@nestjs/common';
 import { CacheModule } from '@nestjs/cache-manager';
-import { WinstonModule } from 'nest-winston';
+import { WinstonModule, utilities as nestWinstonModuleUtilities } from 'nest-winston';
 import * as winston from 'winston';
 import { redisStore } from 'cache-manager-ioredis-yet';
 import { EncarModule } from './encar/encar.module';
@@ -13,7 +13,7 @@ import { EncarModule } from './encar/encar.module';
           format: winston.format.combine(
             winston.format.timestamp(),
             winston.format.ms(),
-            winston.format.nestLike('MyApp', {
+            nestWinstonModuleUtilities.format.nestLike('MyApp', {
               colors: true,
               appName: true,
             }),
