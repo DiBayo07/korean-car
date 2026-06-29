@@ -9,7 +9,7 @@ interface CarDetailsPageProps {
   lang: Language;
 }
 
-export const CarDetailsPage = ({ t, lang }: CarDetailsPageProps) => {
+export const CarDetailsPage = ({ t: _t, lang: _lang }: CarDetailsPageProps) => {
   const { id } = useParams<{ id: string }>();
   const [car, setCar] = useState<any>(null);
   const [loading, setLoading] = useState(true);

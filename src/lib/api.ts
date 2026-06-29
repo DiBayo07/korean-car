@@ -1,4 +1,4 @@
-import type { Language } from './translations';
+// Removed unused imports
 
 export interface Vehicle {
   id: string;
@@ -24,7 +24,7 @@ export interface Vehicle {
   inspectionAvailable?: boolean;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'http://13.63.165.49:3000/api';
 
 export const getVehicles = async (filters: any = {}): Promise<Vehicle[]> => {
   try {
@@ -57,7 +57,7 @@ export const addVehicle = async (vehicle: any): Promise<any> => {
   return vehicle;
 };
 
-export const deleteVehicle = async (id: string): Promise<boolean> => {
+export const deleteVehicle = async (_id: string): Promise<boolean> => {
   console.log('Deleting manually is disabled in Encar sync mode');
   return true;
 };
