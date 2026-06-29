@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowRight } from 'lucide-react';
-import type { Vehicle } from '../lib/supabase';
+import { Link } from 'react-router-dom';
+import type { Vehicle } from '../lib/api';
 import type { TranslationDict } from '../lib/translations';
 
 
@@ -47,10 +48,10 @@ export const BikesSection: React.FC<BikesSectionProps> = ({ t, vehicles }) => {
             </p>
           </div>
           
-          <button className="inline-flex items-center gap-1 text-sm font-bold text-brand-500 hover:text-brand-600 group transition-colors self-start sm:self-auto">
+          <Link to="/korean-car/bikes" className="inline-flex items-center gap-1 text-sm font-bold text-brand-500 hover:text-brand-600 group transition-colors self-start sm:self-auto">
             <span>{t.viewAll}</span>
             <ArrowRight size={16} className="transform group-hover:translate-x-1 transition-transform" />
-          </button>
+          </Link>
         </div>
 
         {/* Grid List */}

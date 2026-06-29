@@ -1,20 +1,42 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Search } from 'lucide-react';
+import type { Vehicle } from '../lib/api';
 import type { TranslationDict } from '../lib/translations';
 
 
 interface HeroProps {
   t: TranslationDict;
+  lang: string;
   onSearch: (brand: string, model: string, generation: string) => void;
-  brands: string[];
-  models: string[];
-  generations: string[];
+  vehicles: Vehicle[];
 }
 
-export const Hero: React.FC<HeroProps> = ({ t, onSearch, brands, models, generations }) => {
+export const Hero: React.FC<HeroProps> = ({ t, lang, onSearch, vehicles }) => {
   const [selectedBrand, setSelectedBrand] = useState('');
   const [selectedModel, setSelectedModel] = useState('');
   const [selectedGeneration, setSelectedGeneration] = useState('');
+
+  const carsOnly = useMemo(() => vehicles.filter(v => v.type === 'car'), [vehicles]);
+  const brands = useMemo(() => Array.from(new Set(carsOnly.map(v => v.brand))).sort(), [carsOnly]);
+
+  // Cascading: models filtered by selected brand
+  const models = useMemo(() => {
+    if (!selectedBrand) return [];
+    return Array.from(new Set(
+      carsOnly.filter(v => v.brand === selectedBrand).map(v => v.model)
+    )).sort();
+  }, [carsOnly, selectedBrand]);
+
+  // Cascading: generations filtered by brand + model
+  const generations = useMemo(() => {
+    if (!selectedModel) return [];
+    return Array.from(new Set(
+      carsOnly
+        .filter(v => v.brand === selectedBrand && v.model === selectedModel)
+        .map(v => v.generation)
+        .filter(Boolean)
+    )).sort() as string[];
+  }, [carsOnly, selectedBrand, selectedModel]);
 
   const handleSearch = () => {
     onSearch(selectedBrand, selectedModel, selectedGeneration);
@@ -89,7 +111,7 @@ export const Hero: React.FC<HeroProps> = ({ t, onSearch, brands, models, generat
             </select>
           </div>
 
-          {/* Model select */}
+          {/* Model select - filtered by brand */}
           <div className="flex-1 flex flex-col px-3 border-r-0 sm:border-r border-slate-100 pb-3 sm:pb-0">
             <span className="text-[10px] font-extrabold text-brand-800 tracking-wider mb-1.5 uppercase opacity-60">
               {t.searchModel}
@@ -108,7 +130,7 @@ export const Hero: React.FC<HeroProps> = ({ t, onSearch, brands, models, generat
             </select>
           </div>
 
-          {/* Generation select */}
+          {/* Generation select - filtered by brand + model */}
           <div className="flex-1 flex flex-col px-3 pb-3 sm:pb-0">
             <span className="text-[10px] font-extrabold text-brand-800 tracking-wider mb-1.5 uppercase opacity-60">
               {t.searchGeneration}
@@ -127,10 +149,10 @@ export const Hero: React.FC<HeroProps> = ({ t, onSearch, brands, models, generat
           {/* Search Button */}
           <button
             onClick={handleSearch}
-            className="sm:w-auto px-8 py-4 bg-brand-500 hover:bg-brand-600 active:scale-95 text-white font-bold rounded-2xl flex items-center justify-center gap-2 shadow-lg hover:shadow-brand-500/25 transition-all duration-200"
+            className="sm:w-auto px-8 py-4 bg-slate-950 hover:bg-black active:scale-95 text-white font-bold rounded-2xl flex items-center justify-center gap-2 shadow-xl hover:shadow-kg-gold/20 transition-all duration-300 border border-slate-800 group"
           >
-            <Search size={18} />
-            <span>{t.searchBtn}</span>
+            <Search size={18} className="text-kg-gold group-hover:scale-110 transition-transform" />
+            {t.searchBtn || (lang === 'ru' ? 'Найти' : lang === 'en' ? 'Search' : 'Издөө')}
           </button>
         </div>
 

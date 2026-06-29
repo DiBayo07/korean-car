@@ -4,5 +4,6 @@ import react from '@vitejs/plugin-react'
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
-  base: './', // Ensures relative assets URLs, making it work perfectly on GitHub Pages subfolders and locally
+  // IMPORTANT: Must match the GitHub repository name for Pages to work correctly
+  base: '/korean-car/',
 })

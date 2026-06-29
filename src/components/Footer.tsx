@@ -43,17 +43,14 @@ export const Footer: React.FC<FooterProps> = ({ t, setActiveSection, setIsAdmin 
             className="flex items-center gap-3 cursor-pointer select-none"
             onClick={() => handleNavClick('home')}
           >
-            {/* Logo Circle */}
-            <div className="relative w-9 h-9 rounded-full flex items-center justify-center overflow-hidden bg-gradient-to-tr from-brand-700 to-brand-500 shadow-md border border-white/10">
-              <div className="absolute top-0 left-0 w-full h-1/2 bg-kg-red/80"></div>
-              <div className="absolute bottom-0 left-0 w-full h-1/2 bg-brand-800/80"></div>
-              <div className="absolute w-4.5 h-4.5 rounded-full bg-kg-gold flex items-center justify-center shadow">
-                <span className="text-[9px] font-black text-brand-900">KG</span>
-              </div>
+            {/* MK Auto Korea Logo */}
+            <div className="relative h-10 flex items-center justify-center">
+              <img 
+                src="/korean-car/mk-auto-korea.jpg" 
+                alt="MK Auto Korea" 
+                className="h-full w-auto object-contain drop-shadow-md rounded-md grayscale hover:grayscale-0 transition-all duration-300"
+              />
             </div>
-            <span className="font-extrabold text-white text-base tracking-tight">
-              KG <span className="font-light text-slate-300 text-sm">Motors Korea</span>
-            </span>
           </div>
 
           <p className="text-sm text-slate-400 leading-relaxed max-w-sm">

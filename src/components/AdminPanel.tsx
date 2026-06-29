@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, ArrowLeft, Loader2, RefreshCw, Car, Bike, ShieldAlert } from 'lucide-react';
-import { getVehicles, addVehicle, deleteVehicle } from '../lib/supabase';
-import type { Vehicle } from '../lib/supabase';
+import { Plus, Trash2, ArrowLeft, Loader2, RefreshCw, Car, Bike, ShieldAlert, Lock, LogIn } from 'lucide-react';
+import { getVehicles, addVehicle, deleteVehicle } from '../lib/api';
+import type { Vehicle } from '../lib/api';
 
 
 interface AdminPanelProps {
@@ -9,14 +9,20 @@ interface AdminPanelProps {
 }
 
 export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
+  // --- Auth State ---
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [loginUser, setLoginUser] = useState('');
+  const [loginPass, setLoginPass] = useState('');
+  const [loginError, setLoginError] = useState('');
+
+  // --- Dashboard State ---
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState('');
-  const [filterType, setFilterType] = useState<'all' | 'car' | 'bike' | 'salvage'>('all');
+  const [activeTab, setActiveTab] = useState<'car' | 'bike'>('car');
 
   // Form states
-  const [type, setType] = useState<'car' | 'bike' | 'salvage'>('car');
   const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');
   const [generation, setGeneration] = useState('');
@@ -34,8 +40,23 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
-    fetchData();
-  }, []);
+    if (isAuthenticated) {
+      fetchData();
+    }
+  }, [isAuthenticated]);
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    setLoginError('');
+    // Simple credential check
+    const validUser = atob('YWRtaW4='); // 'admin'
+    const validPass = atob('YWRtaW4xMjM='); // 'admin123'
+    if (loginUser === validUser && loginPass === validPass) {
+      setIsAuthenticated(true);
+    } else {
+      setLoginError('Неверный логин или пароль');
+    }
+  };
 
   const fetchData = async () => {
     setLoading(true);
@@ -52,7 +73,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!brand || !model || !imageUrl) {
-      setMessage({ text: 'Please fill in Brand, Model, and Image URL', type: 'error' });
+      setMessage({ text: 'Заполните Марку, Модель и URL изображения', type: 'error' });
       return;
     }
 
@@ -60,20 +81,20 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
     setMessage(null);
 
     const vehicleData: Omit<Vehicle, 'id'> = {
-      type,
+      type: activeTab,
       brand: brand.trim(),
       model: model.trim(),
-      generation: generation.trim() || undefined,
-      trim: trim.trim() || undefined,
+      generation: activeTab === 'car' ? (generation.trim() || undefined) : undefined,
+      trim: activeTab === 'car' ? (trim.trim() || undefined) : undefined,
       year: Number(year),
       month: Number(month) || undefined,
       mileage: Number(mileage),
       price_usd: Number(priceUsd),
-      price_krw: type === 'bike' && priceKrw ? Number(priceKrw) : undefined,
+      price_krw: activeTab === 'bike' && priceKrw ? Number(priceKrw) : undefined,
       image_url: imageUrl.trim(),
       status,
-      engine_cc: type === 'bike' && engineCc ? Number(engineCc) : undefined,
-      korean_name: type === 'bike' && koreanName ? koreanName.trim() : undefined,
+      engine_cc: activeTab === 'bike' && engineCc ? Number(engineCc) : undefined,
+      korean_name: activeTab === 'bike' && koreanName ? koreanName.trim() : undefined,
     };
 
     try {
@@ -92,40 +113,107 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       setEngineCc(0);
       setKoreanName('');
       
-      setMessage({ text: 'Vehicle added successfully!', type: 'success' });
+      setMessage({ text: 'Транспорт добавлен успешно!', type: 'success' });
     } catch (err) {
-      setMessage({ text: 'Failed to add vehicle. Try again.', type: 'error' });
+      setMessage({ text: 'Ошибка при добавлении. Попробуйте снова.', type: 'error' });
     } finally {
       setSaving(false);
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this vehicle?')) return;
+    if (!confirm('Вы уверены, что хотите удалить?')) return;
     try {
       const success = await deleteVehicle(id);
       if (success) {
         setVehicles(vehicles.filter(v => v.id !== id));
-        setMessage({ text: 'Vehicle deleted successfully.', type: 'success' });
+        setMessage({ text: 'Удалено успешно.', type: 'success' });
       } else {
-        setMessage({ text: 'Failed to delete vehicle.', type: 'error' });
+        setMessage({ text: 'Ошибка удаления.', type: 'error' });
       }
     } catch (e) {
-      setMessage({ text: 'Error deleting vehicle.', type: 'error' });
+      setMessage({ text: 'Ошибка удаления.', type: 'error' });
     }
   };
 
-  // Filter list
+  // Filter list by active tab and search
   const filteredVehicles = vehicles.filter(v => {
     const matchesSearch = 
       v.brand.toLowerCase().includes(search.toLowerCase()) || 
       v.model.toLowerCase().includes(search.toLowerCase()) ||
       (v.korean_name && v.korean_name.toLowerCase().includes(search.toLowerCase()));
     
-    const matchesType = filterType === 'all' || v.type === filterType;
+    const matchesType = v.type === activeTab;
     return matchesSearch && matchesType;
   });
 
+  // --- LOGIN SCREEN ---
+  if (!isAuthenticated) {
+    return (
+      <div className="min-h-screen bg-slate-950 flex items-center justify-center p-4">
+        <div className="w-full max-w-sm">
+          <div className="bg-[#121824] border border-white/5 rounded-2xl p-8 shadow-2xl">
+            {/* Logo */}
+            <div className="text-center mb-8">
+              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-tr from-brand-700 to-brand-500 shadow-lg border border-white/10 mb-4">
+                <Lock size={24} className="text-kg-gold" />
+              </div>
+              <h1 className="text-xl font-extrabold text-white">KG Motors Korea</h1>
+              <p className="text-[10px] text-kg-gold font-bold uppercase tracking-wider mt-1">Панель администратора</p>
+            </div>
+
+            {loginError && (
+              <div className="p-3 rounded-xl mb-4 bg-red-500/10 text-red-400 border border-red-500/20 text-xs font-semibold flex items-center gap-2">
+                <ShieldAlert size={14} />
+                {loginError}
+              </div>
+            )}
+
+            <form onSubmit={handleLogin} className="space-y-4">
+              <div>
+                <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Логин</label>
+                <input
+                  type="text"
+                  value={loginUser}
+                  onChange={(e) => setLoginUser(e.target.value)}
+                  placeholder="Введите логин"
+                  className="w-full bg-[#1c2436] border border-white/5 rounded-xl py-3 px-4 text-sm font-semibold focus:outline-none focus:border-brand-500/50 text-white"
+                  autoFocus
+                />
+              </div>
+              <div>
+                <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Пароль</label>
+                <input
+                  type="password"
+                  value={loginPass}
+                  onChange={(e) => setLoginPass(e.target.value)}
+                  placeholder="Введите пароль"
+                  className="w-full bg-[#1c2436] border border-white/5 rounded-xl py-3 px-4 text-sm font-semibold focus:outline-none focus:border-brand-500/50 text-white"
+                />
+              </div>
+              <button
+                type="submit"
+                className="w-full py-3.5 bg-brand-500 hover:bg-brand-600 active:scale-[0.98] text-white font-extrabold text-xs tracking-wider uppercase rounded-xl flex items-center justify-center gap-2 shadow-lg transition-all duration-200"
+              >
+                <LogIn size={16} />
+                Войти
+              </button>
+            </form>
+
+            <button
+              onClick={onBack}
+              className="w-full mt-4 py-2.5 text-slate-500 text-xs font-semibold hover:text-slate-300 transition-colors flex items-center justify-center gap-1.5"
+            >
+              <ArrowLeft size={14} />
+              Вернуться на сайт
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // --- ADMIN DASHBOARD ---
   return (
     <div className="min-h-screen bg-slate-950 text-white font-sans">
       {/* Top Navbar */}
@@ -142,17 +230,45 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
               <h1 className="text-xl font-extrabold flex items-center gap-2">
                 KG Motors <span className="font-light text-slate-400 text-sm">Dashboard</span>
               </h1>
-              <p className="text-[10px] text-kg-gold font-bold uppercase tracking-wider">Admin Panel & Inventory Manager</p>
+              <p className="text-[10px] text-kg-gold font-bold uppercase tracking-wider">Admin Panel · Inventory Manager</p>
             </div>
           </div>
 
-          <button
-            onClick={fetchData}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 hover:text-white transition-all text-xs font-semibold"
-          >
-            <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
-            Refresh
-          </button>
+          <div className="flex items-center gap-3">
+            {/* Tab Switcher */}
+            <div className="flex gap-1 bg-slate-800/60 p-1 rounded-xl border border-white/5">
+              <button
+                onClick={() => setActiveTab('car')}
+                className={`py-2 px-4 text-xs font-extrabold rounded-lg uppercase transition-all flex items-center gap-1.5 ${
+                  activeTab === 'car'
+                    ? 'bg-kg-gold/20 text-kg-gold shadow-sm border border-kg-gold/20'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Car size={14} />
+                Авто
+              </button>
+              <button
+                onClick={() => setActiveTab('bike')}
+                className={`py-2 px-4 text-xs font-extrabold rounded-lg uppercase transition-all flex items-center gap-1.5 ${
+                  activeTab === 'bike'
+                    ? 'bg-kg-gold/20 text-kg-gold shadow-sm border border-kg-gold/20'
+                    : 'text-slate-400 hover:text-slate-200'
+                }`}
+              >
+                <Bike size={14} />
+                Мото
+              </button>
+            </div>
+
+            <button
+              onClick={fetchData}
+              className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 hover:text-white transition-all text-xs font-semibold"
+            >
+              <RefreshCw size={14} className={loading ? 'animate-spin' : ''} />
+              Обновить
+            </button>
+          </div>
         </div>
       </div>
 
@@ -163,7 +279,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
           <div className="bg-[#121824] border border-white/5 p-6 rounded-2xl shadow-xl">
             <h2 className="text-lg font-extrabold mb-6 flex items-center gap-2">
               <Plus size={18} className="text-kg-gold" />
-              Add New Vehicle
+              {activeTab === 'car' ? 'Добавить автомобиль' : 'Добавить мотоцикл'}
             </h2>
 
             {message && (
@@ -178,57 +294,36 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
             )}
 
             <form onSubmit={handleAdd} className="space-y-4">
-              
-              {/* Type Switcher */}
-              <div>
-                <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-2 uppercase">Vehicle Type</label>
-                <div className="grid grid-cols-3 gap-2 bg-slate-900/60 p-1 rounded-xl border border-white/5">
-                  {(['car', 'bike', 'salvage'] as const).map(t => (
-                    <button
-                      key={t}
-                      type="button"
-                      onClick={() => setType(t)}
-                      className={`py-2 px-3 text-xs font-semibold rounded-lg capitalize transition-all ${
-                        type === t 
-                          ? 'bg-brand-500 text-white shadow-md' 
-                          : 'text-slate-400 hover:text-slate-200'
-                      }`}
-                    >
-                      {t}
-                    </button>
-                  ))}
-                </div>
-              </div>
 
               {/* Brand and Model */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Brand</label>
+                  <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Марка</label>
                   <input
                     type="text"
                     value={brand}
                     onChange={(e) => setBrand(e.target.value)}
-                    placeholder="Hyundai, Yamaha..."
+                    placeholder={activeTab === 'car' ? 'Hyundai, Kia...' : 'Yamaha, Honda...'}
                     className="w-full bg-[#1c2436] border border-white/5 rounded-xl py-3 px-4 text-sm font-semibold focus:outline-none focus:border-brand-500/50 text-white"
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Model</label>
+                  <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Модель</label>
                   <input
                     type="text"
                     value={model}
                     onChange={(e) => setModel(e.target.value)}
-                    placeholder="Grandeur, YZF-R3..."
+                    placeholder={activeTab === 'car' ? 'Grandeur, K7...' : 'YZF-R3, R7...'}
                     className="w-full bg-[#1c2436] border border-white/5 rounded-xl py-3 px-4 text-sm font-semibold focus:outline-none focus:border-brand-500/50 text-white"
                   />
                 </div>
               </div>
 
               {/* Car Specific: Generation and Trim */}
-              {type === 'car' && (
+              {activeTab === 'car' && (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Generation</label>
+                    <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Поколение</label>
                     <input
                       type="text"
                       value={generation}
@@ -238,12 +333,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Trim / Option</label>
+                    <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Комплектация</label>
                     <input
                       type="text"
                       value={trim}
                       onChange={(e) => setTrim(e.target.value)}
-                      placeholder="2.5 Premium Choice..."
+                      placeholder="2.5 Premium..."
                       className="w-full bg-[#1c2436] border border-white/5 rounded-xl py-3 px-4 text-sm font-semibold focus:outline-none focus:border-brand-500/50 text-white"
                     />
                   </div>
@@ -251,10 +346,10 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
               )}
 
               {/* Bike Specific: Korean name and Engine CC */}
-              {type === 'bike' && (
+              {activeTab === 'bike' && (
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Korean Name</label>
+                    <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Корейское название</label>
                     <input
                       type="text"
                       value={koreanName}
@@ -264,7 +359,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                     />
                   </div>
                   <div>
-                    <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Engine CC</label>
+                    <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Объём двигателя (cc)</label>
                     <input
                       type="number"
                       value={engineCc || ''}
@@ -279,7 +374,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
               {/* Year & Month & Mileage */}
               <div className="grid grid-cols-3 gap-3">
                 <div>
-                  <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Year</label>
+                  <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Год</label>
                   <input
                     type="number"
                     value={year || ''}
@@ -288,7 +383,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Month</label>
+                  <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Месяц</label>
                   <input
                     type="number"
                     value={month || ''}
@@ -297,7 +392,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                   />
                 </div>
                 <div>
-                  <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Mileage (km)</label>
+                  <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Пробег (км)</label>
                   <input
                     type="number"
                     value={mileage || ''}
@@ -310,7 +405,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
               {/* Prices */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Price (USD)</label>
+                  <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Цена (USD)</label>
                   <input
                     type="number"
                     value={priceUsd || ''}
@@ -321,7 +416,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                 </div>
                 <div>
                   <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">
-                    Price (KRW) {type !== 'bike' && '(Optional)'}
+                    Цена (KRW) {activeTab !== 'bike' && '(Необязательно)'}
                   </label>
                   <input
                     type="number"
@@ -335,7 +430,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
 
               {/* Image URL */}
               <div>
-                <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Image URL</label>
+                <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">URL Изображения</label>
                 <input
                   type="text"
                   value={imageUrl}
@@ -347,14 +442,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
 
               {/* Status Select */}
               <div>
-                <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Status</label>
+                <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Статус</label>
                 <select
                   value={status}
                   onChange={(e) => setStatus(e.target.value)}
                   className="w-full bg-[#1c2436] border border-white/5 rounded-xl py-3 px-4 text-sm font-semibold focus:outline-none focus:border-brand-500/50 text-white cursor-pointer"
                 >
-                  <option value="Available">Available</option>
-                  <option value="Sold">Sold</option>
+                  <option value="Available">В наличии</option>
+                  <option value="Sold">Продано</option>
                 </select>
               </div>
 
@@ -367,12 +462,12 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                 {saving ? (
                   <>
                     <Loader2 size={16} className="animate-spin" />
-                    <span>Saving...</span>
+                    <span>Сохранение...</span>
                   </>
                 ) : (
                   <>
                     <Plus size={16} />
-                    <span>Add Vehicle</span>
+                    <span>Добавить {activeTab === 'car' ? 'автомобиль' : 'мотоцикл'}</span>
                   </>
                 )}
               </button>
@@ -384,52 +479,38 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
         {/* List Column - Right */}
         <div className="lg:col-span-7 space-y-6">
           
-          {/* Filters card */}
+          {/* Search card */}
           <div className="bg-[#121824] border border-white/5 p-6 rounded-2xl shadow-xl flex flex-col sm:flex-row gap-4 items-center justify-between">
             {/* Search Input */}
             <input
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search by brand or model..."
+              placeholder="Поиск по марке или модели..."
               className="w-full sm:w-64 bg-[#1c2436] border border-white/5 rounded-xl py-2.5 px-4 text-xs font-semibold focus:outline-none focus:border-brand-500/50 text-white"
             />
-
-            {/* Type selector */}
-            <div className="flex gap-1 bg-slate-900/60 p-1 rounded-lg border border-white/5 self-stretch sm:self-auto justify-between">
-              {(['all', 'car', 'bike', 'salvage'] as const).map(t => (
-                <button
-                  key={t}
-                  onClick={() => setFilterType(t)}
-                  className={`py-1.5 px-3 text-[10px] font-extrabold rounded-md uppercase transition-all ${
-                    filterType === t 
-                      ? 'bg-brand-500 text-white shadow-sm' 
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  {t}
-                </button>
-              ))}
-            </div>
+            <span className="px-3 py-1 rounded-full bg-white/5 text-[10px] text-slate-400 font-bold whitespace-nowrap">
+              {filteredVehicles.length} {activeTab === 'car' ? 'авто' : 'мото'}
+            </span>
           </div>
 
           {/* List Display */}
           <div className="bg-[#121824] border border-white/5 p-6 rounded-2xl shadow-xl min-h-[400px]">
             <h3 className="text-base font-extrabold mb-6 flex items-center justify-between border-b border-white/5 pb-4">
-              <span>Inventory List</span>
-              <span className="px-2 py-0.5 rounded-full bg-white/5 text-[10px] text-slate-400 font-bold">
-                {filteredVehicles.length} Vehicles
+              <span className="flex items-center gap-2">
+                {activeTab === 'car' ? <Car size={16} className="text-kg-gold" /> : <Bike size={16} className="text-kg-gold" />}
+                {activeTab === 'car' ? 'Автомобили' : 'Мотоциклы'}
               </span>
             </h3>
 
             {loading ? (
               <div className="py-24 flex flex-col items-center justify-center text-slate-400 gap-2">
                 <Loader2 size={32} className="animate-spin text-kg-gold" />
-                <span className="text-xs font-semibold">Loading current inventory...</span>
+                <span className="text-xs font-semibold">Загрузка инвентаря...</span>
               </div>
             ) : filteredVehicles.length === 0 ? (
               <div className="py-24 text-center text-slate-500 text-xs font-semibold border border-dashed border-white/5 rounded-xl">
-                No matching vehicles found.
+                {activeTab === 'car' ? 'Автомобили не найдены' : 'Мотоциклы не найдены'}
               </div>
             ) : (
               <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
@@ -456,7 +537,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                         </h4>
                         
                         <p className="text-[10px] text-slate-400 truncate mt-0.5">
-                          {vehicle.year} · {vehicle.mileage.toLocaleString()} km · ${vehicle.price_usd.toLocaleString()}
+                          {vehicle.year} · {vehicle.mileage.toLocaleString()} км · ${vehicle.price_usd.toLocaleString()}
                         </p>
                       </div>
                     </div>

@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { ArrowRight } from 'lucide-react';
-import type { Vehicle } from '../lib/supabase';
+import { Link } from 'react-router-dom';
+import type { Vehicle } from '../lib/api';
 import type { TranslationDict } from '../lib/translations';
 
 
@@ -49,10 +50,10 @@ export const CarsSection: React.FC<CarsSectionProps> = ({ t, vehicles }) => {
             </p>
           </div>
           
-          <button className="inline-flex items-center gap-1 text-sm font-bold text-brand-500 hover:text-brand-600 group transition-colors self-start sm:self-auto">
+          <Link to="/korean-car/cars" className="inline-flex items-center gap-1 text-sm font-bold text-brand-500 hover:text-brand-600 group transition-colors self-start sm:self-auto">
             <span>{t.viewAll}</span>
             <ArrowRight size={16} className="transform group-hover:translate-x-1 transition-transform" />
-          </button>
+          </Link>
         </div>
 
         {/* Tab Filters */}
@@ -80,9 +81,10 @@ export const CarsSection: React.FC<CarsSectionProps> = ({ t, vehicles }) => {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
             {filteredCars.map((car) => (
-              <div 
+              <Link 
+                to={`/korean-car/car/${car.id}`}
                 key={car.id} 
-                className="group bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full transform hover:-translate-y-1"
+                className="group bg-white rounded-2xl border border-slate-100 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col h-full transform hover:-translate-y-1 block"
               >
                 {/* Image Wrap */}
                 <div className="relative aspect-[4/3] bg-slate-100 overflow-hidden">
@@ -146,7 +148,7 @@ export const CarsSection: React.FC<CarsSectionProps> = ({ t, vehicles }) => {
                     </div>
                   </div>
                 </div>
-              </div>
+              </Link>
             ))}
           </div>
         )}
