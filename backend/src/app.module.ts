@@ -3,7 +3,7 @@ import { CacheModule } from '@nestjs/cache-manager';
 import { WinstonModule, utilities as nestWinstonModuleUtilities } from 'nest-winston';
 import * as winston from 'winston';
 import { redisStore } from 'cache-manager-ioredis-yet';
-import { EncarModule } from './encar/encar.module';
+import { ApiModule } from './api.module';
 
 @Module({
   imports: [
@@ -13,7 +13,7 @@ import { EncarModule } from './encar/encar.module';
           format: winston.format.combine(
             winston.format.timestamp(),
             winston.format.ms(),
-            nestWinstonModuleUtilities.format.nestLike('MyApp', {
+            nestWinstonModuleUtilities.format.nestLike('EncarProxy', {
               colors: true,
               appName: true,
             }),
@@ -32,12 +32,10 @@ import { EncarModule } from './encar/encar.module';
             }),
           };
         }
-        return {
-          // Defaults to in-memory cache
-        };
+        return {};
       },
     }),
-    EncarModule,
+    ApiModule,
   ],
 })
 export class AppModule {}
