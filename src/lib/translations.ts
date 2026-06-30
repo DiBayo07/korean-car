@@ -3,7 +3,6 @@ export type Language = 'en' | 'ru' | 'ky';
 export interface TranslationDict {
   navCatalog: string;
   navAuction: string;
-  navBikes: string;
   navSalvage: string;
   navServices: string;
   navAbout: string;
@@ -28,9 +27,6 @@ export interface TranslationDict {
   carsTitle: string;
   carsSubtitle: string;
   viewAll: string;
-  bikesTag: string;
-  bikesTitle: string;
-  bikesSubtitle: string;
   contactTag: string;
   contactTitle: string;
   contactSubtitle: string;
@@ -50,7 +46,6 @@ export const translations: Record<Language, TranslationDict> = {
   en: {
     navCatalog: 'Catalog',
     navAuction: 'Auction',
-    navBikes: 'Bikes',
     navSalvage: 'Salvage',
     navServices: 'Services',
     navAbout: 'About',
@@ -75,9 +70,6 @@ export const translations: Record<Language, TranslationDict> = {
     carsTitle: 'Freshly added Cars',
     carsSubtitle: 'Browse the latest vehicles available for export from Korea',
     viewAll: 'View All',
-    bikesTag: 'TWO-WHEEL DEALS',
-    bikesTitle: 'Newly added Bikes',
-    bikesSubtitle: 'Explore the latest motorcycles available for export from Korea',
     contactTag: 'CONTACT US',
     contactTitle: 'Ready to Find Your Perfect Car?',
     contactSubtitle: 'Get in touch with our team for a personalized quote. We typically respond within 24 hours.',
@@ -95,7 +87,6 @@ export const translations: Record<Language, TranslationDict> = {
   ru: {
     navCatalog: 'Каталог',
     navAuction: 'Аукцион',
-    navBikes: 'Мотоциклы',
     navSalvage: 'Аварийные',
     navServices: 'Услуги',
     navAbout: 'О нас',
@@ -120,9 +111,6 @@ export const translations: Record<Language, TranslationDict> = {
     carsTitle: 'Свежие поступления автомобилей',
     carsSubtitle: 'Ознакомьтесь с последними автомобилями для экспорта из Кореи',
     viewAll: 'Смотреть все',
-    bikesTag: 'ДВУХКОЛЕСНЫЙ ТРАНСПОРТ',
-    bikesTitle: 'Свежие поступления мотоциклов',
-    bikesSubtitle: 'Ознакомьтесь с новыми предложениями мотоциклов из Кореи',
     contactTag: 'СВЯЗАТЬСЯ С НАМИ',
     contactTitle: 'Готовы найти идеальный автомобиль?',
     contactSubtitle: 'Свяжитесь с нашей командой для персонального расчета стоимости доставки. Ответ в течение 24 часов.',
@@ -140,7 +128,6 @@ export const translations: Record<Language, TranslationDict> = {
   ky: {
     navCatalog: 'Каталог',
     navAuction: 'Аукцион',
-    navBikes: 'Мотоциклдер',
     navSalvage: 'Авариялык',
     navServices: 'Кызматтар',
     navAbout: 'Биз жөнүндө',
@@ -165,9 +152,6 @@ export const translations: Record<Language, TranslationDict> = {
     carsTitle: 'Жаңы кошулган автоунаалар',
     carsSubtitle: 'Кореядан экспорттоого жеткиликтүү болгон акыркы унааларды көрүңүз',
     viewAll: 'Баарын көрүү',
-    bikesTag: 'ЭКИ ДӨНГӨЛӨКТҮҮ ТРАНСПОРТ',
-    bikesTitle: 'Жаңы кошулган мотоциклдер',
-    bikesSubtitle: 'Кореядан экспорттоого даяр болгон акыркы мотоциклдерди көрүңүз',
     contactTag: 'БИЗ МЕНЕН БАЙЛАНЫШЫҢЫЗ',
     contactTitle: 'Идеалдуу унааңызды табууга даярсызбы?',
     contactSubtitle: 'Жеткирүү баасын эсептөө үчүн биздин команда менен байланышыңыз. Биз 24 сааттын ичинде жооп беребиз.',

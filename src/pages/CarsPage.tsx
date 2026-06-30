@@ -1,59 +1,45 @@
-import { useState, useMemo } from 'react';
+import { useState } from 'react';
 import { Search, Calendar, Gauge, DollarSign } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import type { Vehicle } from '../lib/api';
+import { translateBrandName } from '../api/encarApi';
+import type { CarapisManufacturer, CarapisModelGroup, CarapisModel } from '../api/encarApi';
+import type { EncarVehicle } from '../api/encarApi';
 import type { Language, TranslationDict } from '../lib/translations';
 
 interface CarsPageProps {
-  vehicles: Vehicle[];
+  vehicles: EncarVehicle[];
   t: TranslationDict;
   lang: Language;
+  loading: boolean;
+  hasMore: boolean;
+  loadMore: () => void;
+  // Catalog data
+  manufacturers: CarapisManufacturer[];
+  manufacturersLoading: boolean;
+  modelGroups: CarapisModelGroup[];
+  modelGroupsLoading: boolean;
+  models: CarapisModel[];
+  modelsLoading: boolean;
+  fetchModelGroups: (slug: string) => void;
+  fetchModels: (manSlug: string, modelGroupSlug: string) => void;
+  setFilters: (f: any) => void;
 }
 
-export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang }) => {
+export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, hasMore, loadMore, manufacturers, manufacturersLoading, modelGroups, modelGroupsLoading, models, modelsLoading, fetchModelGroups, fetchModels, setFilters }) => {
   const [selectedBrand, setSelectedBrand] = useState('');
   const [selectedModel, setSelectedModel] = useState('');
   const [selectedGeneration, setSelectedGeneration] = useState('');
-  const [visibleCount, setVisibleCount] = useState(12);
 
-  const carsOnly = useMemo(() => vehicles.filter(v => v.type === 'car'), [vehicles]);
-  const brands = useMemo(() => Array.from(new Set(carsOnly.map(v => v.brand))).sort(), [carsOnly]);
-
-  // Cascading: models filtered by selected brand
-  const models = useMemo(() => {
-    if (!selectedBrand) return [];
-    return Array.from(new Set(
-      carsOnly.filter(v => v.brand === selectedBrand).map(v => v.model)
-    )).sort();
-  }, [carsOnly, selectedBrand]);
-
-  // Cascading: generations filtered by selected brand + model
-  const generations = useMemo(() => {
-    if (!selectedModel) return [];
-    return Array.from(new Set(
-      carsOnly
-        .filter(v => v.brand === selectedBrand && v.model === selectedModel)
-        .map(v => v.generation)
-        .filter(Boolean)
-    )).sort() as string[];
-  }, [carsOnly, selectedBrand, selectedModel]);
-
-  // Filtered results
-  const filtered = useMemo(() => {
-    return carsOnly.filter(v => {
-      const matchBrand = !selectedBrand || v.brand === selectedBrand;
-      const matchModel = !selectedModel || v.model === selectedModel;
-      const matchGen = !selectedGeneration || v.generation === selectedGeneration;
-      return matchBrand && matchModel && matchGen;
-    });
-  }, [carsOnly, selectedBrand, selectedModel, selectedGeneration]);
-
-  const visibleCars = filtered.slice(0, visibleCount);
+  const sortedManufacturers = [...manufacturers]
+    .map(m => ({ ...m, translatedName: translateBrandName(m.name) }))
+    .sort((a, b) => a.translatedName.localeCompare(b.translatedName));
+  const brandNames = [...new Set(sortedManufacturers.map(m => m.translatedName))];
 
   const clearFilters = () => {
     setSelectedBrand('');
     setSelectedModel('');
     setSelectedGeneration('');
+    setFilters({});
   };
 
   return (
@@ -82,8 +68,7 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang }) => {
 
       {/* Search / Filter Bar */}
       <div className="sticky top-20 z-30 bg-slate-950/95 backdrop-blur-md border-b border-white/5 py-4 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">
-          {/* Brand */}
+        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row gap-3 items-stretch sm:items-center">            {/* Brand */}
           <div className="flex-1 flex flex-col bg-[#121824] rounded-xl px-4 py-2.5 border border-white/5">
             <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">{t.searchBrand}</span>
             <select
@@ -92,11 +77,13 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang }) => {
                 setSelectedBrand(e.target.value);
                 setSelectedModel('');
                 setSelectedGeneration('');
+                const man = manufacturers.find(m => translateBrandName(m.name) === e.target.value || m.slug === e.target.value);
+                if (man) { fetchModelGroups(man.slug); setFilters({ manufacturer_slug: man.slug }); }
               }}
               className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer"
             >
-              <option value="" className="bg-slate-900">{t.selectBrand}</option>
-              {brands.map(b => <option key={b} value={b} className="bg-slate-900">{b}</option>)}
+              <option value="" className="bg-slate-900">{manufacturersLoading ? 'Loading...' : t.selectBrand}</option>
+              {brandNames.map(b => <option key={b} value={b} className="bg-slate-900">{b}</option>)}
             </select>
           </div>
 
@@ -108,12 +95,15 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang }) => {
               onChange={(e) => {
                 setSelectedModel(e.target.value);
                 setSelectedGeneration('');
+                const man = manufacturers.find(m => translateBrandName(m.name) === selectedBrand || m.slug === selectedBrand);
+                const mg = modelGroups.find(mg => mg.name === e.target.value || mg.slug === e.target.value);
+                if (man && mg) { fetchModels(man.slug, mg.slug); setFilters({ manufacturer_slug: man.slug, model_group_slug: mg.slug }); }
               }}
               disabled={!selectedBrand}
               className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <option value="" className="bg-slate-900">{t.selectModel}</option>
-              {models.map(m => <option key={m} value={m} className="bg-slate-900">{m}</option>)}
+              <option value="" className="bg-slate-900">{modelGroupsLoading ? 'Loading...' : t.selectModel}</option>
+              {modelGroups.map(mg => <option key={mg.slug} value={mg.name} className="bg-slate-900">{mg.name}</option>)}
             </select>
           </div>
 
@@ -122,12 +112,18 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang }) => {
             <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">{t.searchGeneration}</span>
             <select
               value={selectedGeneration}
-              onChange={(e) => setSelectedGeneration(e.target.value)}
+              onChange={(e) => {
+                setSelectedGeneration(e.target.value);
+                const man = manufacturers.find(m => translateBrandName(m.name) === selectedBrand || m.slug === selectedBrand);
+                const mg = modelGroups.find(mg => mg.name === selectedModel || mg.slug === selectedModel);
+                const mod = models.find(m => m.name === e.target.value || m.slug === e.target.value);
+                if (man && mg && mod) setFilters({ manufacturer_slug: man.slug, model_group_slug: mg.slug, model_slug: mod.slug });
+              }}
               disabled={!selectedModel}
               className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
             >
-              <option value="" className="bg-slate-900">{t.selectGeneration}</option>
-              {generations.map(g => <option key={g} value={g} className="bg-slate-900">{g}</option>)}
+              <option value="" className="bg-slate-900">{modelsLoading ? 'Loading...' : t.selectGeneration}</option>
+              {models.map(m => <option key={m.slug} value={m.name} className="bg-slate-900">{m.name}</option>)}
             </select>
           </div>
 
@@ -142,7 +138,7 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang }) => {
               </button>
             )}
             <span className="text-xs text-slate-500 font-semibold whitespace-nowrap">
-              {filtered.length} {lang === 'en' ? 'cars' : lang === 'ru' ? 'авто' : 'унаа'}
+              {loading ? '...' : vehicles.length} {lang === 'en' ? 'cars' : lang === 'ru' ? 'авто' : 'унаа'}
             </span>
           </div>
         </div>
@@ -150,7 +146,12 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang }) => {
 
       {/* Cars Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        {filtered.length === 0 ? (
+        {loading && vehicles.length === 0 ? (
+          <div className="py-24 text-center flex flex-col items-center justify-center gap-3">
+            <div className="w-8 h-8 rounded-full border-2 border-t-kg-gold border-slate-800 animate-spin" />
+            <p className="text-slate-500 text-xs font-semibold">Загрузка...</p>
+          </div>
+        ) : vehicles.length === 0 ? (
           <div className="py-24 text-center">
             <Search size={48} className="mx-auto text-slate-700 mb-4" />
             <p className="text-slate-500 text-sm font-semibold">
@@ -163,7 +164,7 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang }) => {
         ) : (
           <>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-              {visibleCars.map((car) => (
+              {vehicles.map((car) => (
               <Link
                   to={`/korean-car/car/${car.id}`}
                   key={car.id}
@@ -224,14 +225,15 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang }) => {
               ))}
             </div>
 
-            {/* Show More */}
-            {visibleCount < filtered.length && (
+            {/* Show More / Load More */}
+            {hasMore && (
               <div className="text-center mt-10">
                 <button
-                  onClick={() => setVisibleCount(prev => prev + 12)}
-                  className="px-8 py-3 bg-brand-500 hover:bg-brand-600 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg hover:shadow-brand-500/20 transition-all"
+                  onClick={loadMore}
+                  disabled={loading}
+                  className="px-8 py-3 bg-brand-500 hover:bg-brand-600 disabled:opacity-40 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg hover:shadow-brand-500/20 transition-all"
                 >
-                  {lang === 'en' ? 'Show More' : lang === 'ru' ? 'Показать ещё' : 'Дагы көрсөтүү'} ({filtered.length - visibleCount} {lang === 'en' ? 'remaining' : lang === 'ru' ? 'осталось' : 'калды'})
+                  {loading ? 'Загрузка...' : (lang === 'en' ? 'Load More' : lang === 'ru' ? 'Загрузить ещё' : 'Дагы жүктөө')}
                 </button>
               </div>
             )}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, ArrowLeft, Loader2, RefreshCw, Car, Bike, ShieldAlert, Lock, LogIn } from 'lucide-react';
+import { Plus, Trash2, ArrowLeft, Loader2, RefreshCw, Car, ShieldAlert, Lock, LogIn } from 'lucide-react';
 import { getVehicles, addVehicle, deleteVehicle } from '../lib/api';
 import type { Vehicle } from '../lib/api';
 
@@ -20,8 +20,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [search, setSearch] = useState('');
-  const [activeTab, setActiveTab] = useState<'car' | 'bike'>('car');
-
   // Form states
   const [brand, setBrand] = useState('');
   const [model, setModel] = useState('');
@@ -34,9 +32,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
   const [priceKrw, setPriceKrw] = useState(0);
   const [imageUrl, setImageUrl] = useState('');
   const [status, setStatus] = useState('Available');
-  const [engineCc, setEngineCc] = useState(0);
-  const [koreanName, setKoreanName] = useState('');
-
   const [message, setMessage] = useState<{ text: string; type: 'success' | 'error' } | null>(null);
 
   useEffect(() => {
@@ -81,25 +76,23 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
     setMessage(null);
 
     const vehicleData: Omit<Vehicle, 'id'> = {
-      type: activeTab,
+      type: 'car' as const,
       brand: brand.trim(),
       model: model.trim(),
-      generation: activeTab === 'car' ? (generation.trim() || undefined) : undefined,
-      trim: activeTab === 'car' ? (trim.trim() || undefined) : undefined,
+      generation: generation.trim() || undefined,
+      trim: trim.trim() || undefined,
       year: Number(year),
       month: Number(month) || undefined,
       mileage: Number(mileage),
       price_usd: Number(priceUsd),
-      price_krw: activeTab === 'bike' && priceKrw ? Number(priceKrw) : undefined,
+      price_krw: priceKrw ? Number(priceKrw) : undefined,
       image_url: imageUrl.trim(),
       status,
-      engine_cc: activeTab === 'bike' && engineCc ? Number(engineCc) : undefined,
-      korean_name: activeTab === 'bike' && koreanName ? koreanName.trim() : undefined,
     };
 
     try {
       const added = await addVehicle(vehicleData);
-      setVehicles([added, ...vehicles]);
+      setVehicles([added as Vehicle, ...vehicles]);
       
       // Reset Form
       setBrand('');
@@ -110,9 +103,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       setPriceUsd(0);
       setPriceKrw(0);
       setImageUrl('');
-      setEngineCc(0);
-      setKoreanName('');
-      
       setMessage({ text: 'Транспорт добавлен успешно!', type: 'success' });
     } catch (err) {
       setMessage({ text: 'Ошибка при добавлении. Попробуйте снова.', type: 'error' });
@@ -143,8 +133,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
       v.model.toLowerCase().includes(search.toLowerCase()) ||
       (v.korean_name && v.korean_name.toLowerCase().includes(search.toLowerCase()));
     
-    const matchesType = v.type === activeTab;
-    return matchesSearch && matchesType;
+    return matchesSearch;
   });
 
   // --- LOGIN SCREEN ---
@@ -235,32 +224,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
           </div>
 
           <div className="flex items-center gap-3">
-            {/* Tab Switcher */}
-            <div className="flex gap-1 bg-slate-800/60 p-1 rounded-xl border border-white/5">
-              <button
-                onClick={() => setActiveTab('car')}
-                className={`py-2 px-4 text-xs font-extrabold rounded-lg uppercase transition-all flex items-center gap-1.5 ${
-                  activeTab === 'car'
-                    ? 'bg-kg-gold/20 text-kg-gold shadow-sm border border-kg-gold/20'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <Car size={14} />
-                Авто
-              </button>
-              <button
-                onClick={() => setActiveTab('bike')}
-                className={`py-2 px-4 text-xs font-extrabold rounded-lg uppercase transition-all flex items-center gap-1.5 ${
-                  activeTab === 'bike'
-                    ? 'bg-kg-gold/20 text-kg-gold shadow-sm border border-kg-gold/20'
-                    : 'text-slate-400 hover:text-slate-200'
-                }`}
-              >
-                <Bike size={14} />
-                Мото
-              </button>
-            </div>
-
             <button
               onClick={fetchData}
               className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 text-slate-300 hover:text-white transition-all text-xs font-semibold"
@@ -279,7 +242,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
           <div className="bg-[#121824] border border-white/5 p-6 rounded-2xl shadow-xl">
             <h2 className="text-lg font-extrabold mb-6 flex items-center gap-2">
               <Plus size={18} className="text-kg-gold" />
-              {activeTab === 'car' ? 'Добавить автомобиль' : 'Добавить мотоцикл'}
+              Добавить автомобиль
             </h2>
 
             {message && (
@@ -293,9 +256,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
               </div>
             )}
 
-            <form onSubmit={handleAdd} className="space-y-4">
-
-              {/* Brand and Model */}
+            <form onSubmit={handleAdd} className="space-y-4">                  {/* Brand and Model */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
                   <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Марка</label>
@@ -303,7 +264,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                     type="text"
                     value={brand}
                     onChange={(e) => setBrand(e.target.value)}
-                    placeholder={activeTab === 'car' ? 'Hyundai, Kia...' : 'Yamaha, Honda...'}
+                    placeholder="Hyundai, Kia..."
                     className="w-full bg-[#1c2436] border border-white/5 rounded-xl py-3 px-4 text-sm font-semibold focus:outline-none focus:border-brand-500/50 text-white"
                   />
                 </div>
@@ -313,15 +274,14 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                     type="text"
                     value={model}
                     onChange={(e) => setModel(e.target.value)}
-                    placeholder={activeTab === 'car' ? 'Grandeur, K7...' : 'YZF-R3, R7...'}
+                    placeholder="Grandeur, K7..."
                     className="w-full bg-[#1c2436] border border-white/5 rounded-xl py-3 px-4 text-sm font-semibold focus:outline-none focus:border-brand-500/50 text-white"
                   />
                 </div>
               </div>
 
-              {/* Car Specific: Generation and Trim */}
-              {activeTab === 'car' && (
-                <div className="grid grid-cols-2 gap-4">
+              {/* Generation and Trim */}
+              <div className="grid grid-cols-2 gap-4">
                   <div>
                     <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Поколение</label>
                     <input
@@ -343,33 +303,6 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                     />
                   </div>
                 </div>
-              )}
-
-              {/* Bike Specific: Korean name and Engine CC */}
-              {activeTab === 'bike' && (
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Корейское название</label>
-                    <input
-                      type="text"
-                      value={koreanName}
-                      onChange={(e) => setKoreanName(e.target.value)}
-                      placeholder="로얄엔필드 인터셉터..."
-                      className="w-full bg-[#1c2436] border border-white/5 rounded-xl py-3 px-4 text-sm font-semibold focus:outline-none focus:border-brand-500/50 text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">Объём двигателя (cc)</label>
-                    <input
-                      type="number"
-                      value={engineCc || ''}
-                      onChange={(e) => setEngineCc(Number(e.target.value))}
-                      placeholder="650, 321..."
-                      className="w-full bg-[#1c2436] border border-white/5 rounded-xl py-3 px-4 text-sm font-semibold focus:outline-none focus:border-brand-500/50 text-white"
-                    />
-                  </div>
-                </div>
-              )}
 
               {/* Year & Month & Mileage */}
               <div className="grid grid-cols-3 gap-3">
@@ -416,7 +349,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                 </div>
                 <div>
                   <label className="text-[10px] font-extrabold text-slate-400 tracking-wider block mb-1.5 uppercase">
-                    Цена (KRW) {activeTab !== 'bike' && '(Необязательно)'}
+                    Цена (KRW) (Необязательно)
                   </label>
                   <input
                     type="number"
@@ -467,7 +400,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                 ) : (
                   <>
                     <Plus size={16} />
-                    <span>Добавить {activeTab === 'car' ? 'автомобиль' : 'мотоцикл'}</span>
+                    <span>Добавить автомобиль</span>
                   </>
                 )}
               </button>
@@ -490,7 +423,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
               className="w-full sm:w-64 bg-[#1c2436] border border-white/5 rounded-xl py-2.5 px-4 text-xs font-semibold focus:outline-none focus:border-brand-500/50 text-white"
             />
             <span className="px-3 py-1 rounded-full bg-white/5 text-[10px] text-slate-400 font-bold whitespace-nowrap">
-              {filteredVehicles.length} {activeTab === 'car' ? 'авто' : 'мото'}
+              {filteredVehicles.length} авто
             </span>
           </div>
 
@@ -498,8 +431,8 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
           <div className="bg-[#121824] border border-white/5 p-6 rounded-2xl shadow-xl min-h-[400px]">
             <h3 className="text-base font-extrabold mb-6 flex items-center justify-between border-b border-white/5 pb-4">
               <span className="flex items-center gap-2">
-                {activeTab === 'car' ? <Car size={16} className="text-kg-gold" /> : <Bike size={16} className="text-kg-gold" />}
-                {activeTab === 'car' ? 'Автомобили' : 'Мотоциклы'}
+                <Car size={16} className="text-kg-gold" />
+                Автомобили
               </span>
             </h3>
 
@@ -510,7 +443,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
               </div>
             ) : filteredVehicles.length === 0 ? (
               <div className="py-24 text-center text-slate-500 text-xs font-semibold border border-dashed border-white/5 rounded-xl">
-                {activeTab === 'car' ? 'Автомобили не найдены' : 'Мотоциклы не найдены'}
+                Автомобили не найдены
               </div>
             ) : (
               <div className="space-y-4 max-h-[600px] overflow-y-auto pr-2">
@@ -532,7 +465,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
                       {/* Details */}
                       <div className="min-w-0">
                         <h4 className="text-sm font-bold text-white truncate flex items-center gap-1.5">
-                          {vehicle.type === 'car' ? <Car size={13} className="text-slate-400" /> : <Bike size={13} className="text-slate-400" />}
+                          <Car size={13} className="text-slate-400" />
                           {vehicle.brand} {vehicle.model}
                         </h4>
                         

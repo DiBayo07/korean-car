@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Globe, ChevronDown, Check, Menu, X, Car, Bike } from 'lucide-react';
+import { Globe, ChevronDown, Check, Menu, X, Car } from 'lucide-react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import type { Language, TranslationDict } from '../lib/translations';
 
@@ -118,7 +118,7 @@ export const Header: React.FC<HeaderProps> = ({
         onClick={() => setMobileMenuOpen(false)}
       />
     )}
-    <header ref={headerRef} className="sticky top-0 z-50 w-full glass-panel border-b border-white/5 transition-all duration-300">
+    <header ref={headerRef} className="sticky top-0 z-50 w-full bg-black border-b-2 border-red-600 transition-all duration-300 shadow-lg shadow-black/50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
         {/* Logo */}
         <Link
@@ -127,12 +127,16 @@ export const Header: React.FC<HeaderProps> = ({
           className="flex items-center gap-3 cursor-pointer select-none"
         >
           {/* MK Auto Korea Logo */}
-          <div className="relative h-12 flex items-center justify-center">
+          <div className="relative h-14 flex items-center justify-center">
             <img 
               src={`${basePath}/mk-auto-korea.jpg`} 
               alt="MK Auto Korea" 
               className="h-full w-auto object-contain drop-shadow-md rounded-md"
             />
+          </div>
+          <div className="flex flex-col leading-none hidden sm:flex">
+            <span className="text-white font-extrabold text-lg tracking-[0.1em] uppercase">MK</span>
+            <span className="text-red-500 font-bold text-[10px] tracking-[0.2em] uppercase">Auto Korea</span>
           </div>
         </Link>
 
@@ -151,13 +155,6 @@ export const Header: React.FC<HeaderProps> = ({
           >
             <Car size={14} />
             {currentLang === 'en' ? 'Cars' : currentLang === 'ru' ? 'Авто' : 'Унаалар'}
-          </Link>
-          <Link
-            to={`${basePath}/bikes`}
-            className={`text-sm font-medium tracking-wide transition-colors flex items-center gap-1.5 ${isActive(`${basePath}/bikes`) ? 'text-kg-gold' : 'text-slate-300 hover:text-white'}`}
-          >
-            <Bike size={14} />
-            {t.navBikes}
           </Link>
           <button 
             onClick={() => handleScrollToSection('services')} 
@@ -288,14 +285,6 @@ export const Header: React.FC<HeaderProps> = ({
             >
               <Car size={16} />
               {currentLang === 'en' ? 'Cars' : currentLang === 'ru' ? 'Авто' : 'Унаалар'}
-            </Link>
-            <Link
-              to={`${basePath}/bikes`}
-              onClick={() => setMobileMenuOpen(false)}
-              className={`block w-full text-left py-2 px-3 rounded-lg text-sm font-semibold flex items-center gap-2 ${isActive(`${basePath}/bikes`) ? 'bg-brand-500/10 text-kg-gold' : 'text-slate-300 hover:bg-white/5'}`}
-            >
-              <Bike size={16} />
-              {t.navBikes}
             </Link>
             <button
               onClick={() => handleScrollToSection('services')}

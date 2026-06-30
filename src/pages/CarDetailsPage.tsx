@@ -1,8 +1,8 @@
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { ChevronLeft, Calendar, Gauge, Fuel, Settings, ShieldCheck, MapPin, CheckCircle2, MessageCircle } from 'lucide-react';
+import { ChevronLeft, Calendar, Gauge, Fuel, Settings, ShieldCheck, MapPin, CheckCircle2, MessageCircle, Cpu, Palette, Car } from 'lucide-react';
 import type { Language, TranslationDict } from '../lib/translations';
-import { getCarDetails } from '../lib/api'; // We will create this
+import { useVehicle } from '../hooks/useVehicle';
 
 interface CarDetailsPageProps {
   t: TranslationDict;
@@ -11,24 +11,8 @@ interface CarDetailsPageProps {
 
 export const CarDetailsPage = ({ t: _t, lang: _lang }: CarDetailsPageProps) => {
   const { id } = useParams<{ id: string }>();
-  const [car, setCar] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
+  const { vehicle: car, loading } = useVehicle(id);
   const [activeImage, setActiveImage] = useState(0);
-
-  useEffect(() => {
-    if (id) {
-      setLoading(true);
-      getCarDetails(id)
-        .then((data) => {
-          setCar(data);
-          setLoading(false);
-        })
-        .catch((err) => {
-          console.error(err);
-          setLoading(false);
-        });
-    }
-  }, [id]);
 
   if (loading) {
     return (
@@ -48,7 +32,8 @@ export const CarDetailsPage = ({ t: _t, lang: _lang }: CarDetailsPageProps) => {
   }
 
   const handleWhatsApp = () => {
-    const text = `Здравствуйте, меня интересует этот автомобиль: ${car.brand} ${car.model}\nЦена: $${car.price}\nСсылка: ${window.location.href}`;
+    const usdPrice = car.price_usd || Math.round((car.price || 0) / 1350);
+    const text = `Здравствуйте, меня интересует этот автомобиль: ${car.brand} ${car.model}\nЦена: $${usdPrice.toLocaleString()}\nСсылка: ${window.location.href}`;
     window.open(`https://wa.me/821065914114?text=${encodeURIComponent(text)}`, '_blank');
   };
 
@@ -118,8 +103,9 @@ export const CarDetailsPage = ({ t: _t, lang: _lang }: CarDetailsPageProps) => {
               </div>
 
               <div className="mb-8">
-                <span className="text-4xl font-black text-kg-gold">${car.price?.toLocaleString()}</span>
-                <span className="text-slate-400 text-sm ml-2">под ключ до Бишкека</span>
+                <span className="text-4xl font-black text-kg-gold">${(car.price_usd || Math.round((car.price || 0) / 1350)).toLocaleString()}</span>
+                {car.price && <span className="text-slate-400 text-sm ml-2 block sm:inline">(₩{car.price.toLocaleString()} KRW)</span>}
+                <span className="text-slate-400 text-sm ml-2 block sm:inline">под ключ до Бишкека</span>
               </div>
 
               {/* Specs Grid */}
@@ -144,6 +130,42 @@ export const CarDetailsPage = ({ t: _t, lang: _lang }: CarDetailsPageProps) => {
                   <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">Коробка</span>
                   <span className="text-sm font-semibold text-white">{car.transmission || 'Автомат'}</span>
                 </div>
+                {car.body_type && (
+                  <div className="bg-slate-900/80 p-4 rounded-2xl flex flex-col gap-1 border border-white/5">
+                    <Car size={18} className="text-brand-400 mb-1" />
+                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">Кузов</span>
+                    <span className="text-sm font-semibold text-white capitalize">{car.body_type}</span>
+                  </div>
+                )}
+                {car.drive_type && (
+                  <div className="bg-slate-900/80 p-4 rounded-2xl flex flex-col gap-1 border border-white/5">
+                    <Cpu size={18} className="text-brand-400 mb-1" />
+                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">Привод</span>
+                    <span className="text-sm font-semibold text-white capitalize">{car.drive_type}</span>
+                  </div>
+                )}
+                {car.engine_cc && (
+                  <div className="bg-slate-900/80 p-4 rounded-2xl flex flex-col gap-1 border border-white/5">
+                    <Cpu size={18} className="text-brand-400 mb-1" />
+                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">Двигатель</span>
+                    <span className="text-sm font-semibold text-white">{car.engine_cc} cc</span>
+                  </div>
+                )}
+                {car.color && (
+                  <div className="bg-slate-900/80 p-4 rounded-2xl flex flex-col gap-1 border border-white/5">
+                    <Palette size={18} className="text-brand-400 mb-1" />
+                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">Цвет</span>
+                    <span className="text-sm font-semibold text-white capitalize">{car.color}</span>
+                  </div>
+                )}
+                {car.location && (
+                  <div className="bg-slate-900/80 p-4 rounded-2xl flex flex-col gap-1 border border-white/5">
+                    <MapPin size={18} className="text-brand-400 mb-1" />
+                    <span className="text-xs text-slate-500 font-bold uppercase tracking-wider">Расположение</span>
+                    <span className="text-sm font-semibold text-white">{car.location}</span>
+                  </div>
+                )}
+
               </div>
 
               {car.inspectionAvailable && (
@@ -153,6 +175,18 @@ export const CarDetailsPage = ({ t: _t, lang: _lang }: CarDetailsPageProps) => {
                     <h4 className="text-emerald-400 font-bold text-sm mb-1">Encar Гарантия</h4>
                     <p className="text-emerald-500/80 text-xs leading-relaxed">
                       Автомобиль прошел полную диагностику Encar. Отсутствуют скрытые дефекты.
+                    </p>
+                  </div>
+                </div>
+              )}
+
+              {car.accident_history && (
+                <div className="mb-8 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-3">
+                  <ShieldCheck className="text-amber-500 flex-shrink-0 mt-0.5" size={20} />
+                  <div>
+                    <h4 className="text-amber-400 font-bold text-sm mb-1">История аварий</h4>
+                    <p className="text-amber-500/80 text-xs leading-relaxed">
+                      {car.accident_history}
                     </p>
                   </div>
                 </div>

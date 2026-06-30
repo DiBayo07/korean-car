@@ -3,14 +3,13 @@ import { Routes, Route, useLocation } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
 import { CarsSection } from './components/CarsSection';
-import { BikesSection } from './components/BikesSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 
 import { CarsPage } from './pages/CarsPage';
-import { BikesPage } from './pages/BikesPage';
 import { CarDetailsPage } from './pages/CarDetailsPage';
-import { getVehicles } from './lib/api';
+import { useVehicles } from './hooks/useVehicles';
+import type { UseVehiclesFilters } from './hooks/useVehicles';
 import type { Vehicle } from './lib/api';
 import { translations } from './lib/translations';
 import type { Language } from './lib/translations';
@@ -27,40 +26,23 @@ function ScrollToTop() {
 function App() {
   const [lang, setLang] = useState<Language>('ru');
 
-  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
-  const [loading, setLoading] = useState(true);
+  const {
+    vehicles: encarVehicles, loading, filters: encarFilters, setFilters: setEncarFilters,
+    manufacturers, manufacturersLoading,
+    modelGroups, modelGroupsLoading,
+    models, modelsLoading,
+    fetchModelGroups, fetchModels,
+    hasMore, loadMore,
+  } = useVehicles({ limit: 50 });
+  
+  // Convert EncarVehicle[] to Vehicle[] for compatibility with existing components
+  const vehicles = encarVehicles as unknown as Vehicle[];
   
   // Search state (for home page hero search)
   const [searchResults, setSearchResults] = useState<Vehicle[] | null>(null);
   const [searchCriteria, setSearchCriteria] = useState<{ brand?: string; model?: string } | null>(null);
 
   const t = translations[lang];
-
-  // --- ALL HOOKS BEFORE ANY CONDITIONAL RETURN ---
-
-  useEffect(() => {
-    let cancelled = false;
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const data = await getVehicles();
-        if (!cancelled) {
-          setVehicles(Array.isArray(data) ? data : []);
-        }
-      } catch (e) {
-        console.error(e);
-        if (!cancelled) {
-          setVehicles([]);
-        }
-      } finally {
-        if (!cancelled) {
-          setLoading(false);
-        }
-      }
-    };
-    fetchData();
-    return () => { cancelled = true; };
-  }, []);
 
   const carsOnly = useMemo(() => vehicles.filter(v => v.type === 'car'), [vehicles]);
 
@@ -87,13 +69,18 @@ function App() {
     setSearchCriteria(null);
   }, []);
 
+  // Handler for encar API filter changes from Hero
+  const handleEncarFilterChange = useCallback((filters: UseVehiclesFilters) => {
+    setEncarFilters(filters);
+  }, [setEncarFilters]);
+
   // --- CONDITIONAL RETURNS ---
 
   if (loading) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-400 gap-3">
         <div className="w-10 h-10 rounded-full border-4 border-t-kg-gold border-slate-800 animate-spin" />
-        <span className="text-xs font-bold tracking-[0.2em] text-kg-gold uppercase">KG Motors Korea</span>
+        <span className="text-xs font-bold tracking-[0.2em] text-kg-gold uppercase">MK Auto Korea</span>
       </div>
     );
   }
@@ -108,7 +95,16 @@ function App() {
         t={t}
         lang={lang}
         onSearch={handleSearch}
-        vehicles={vehicles}
+        manufacturers={manufacturers}
+        manufacturersLoading={manufacturersLoading}
+        modelGroups={modelGroups}
+        modelGroupsLoading={modelGroupsLoading}
+        models={models}
+        modelsLoading={modelsLoading}
+        fetchModelGroups={fetchModelGroups}
+        fetchModels={fetchModels}
+        encarFilters={encarFilters}
+        onEncarFilterChange={handleEncarFilterChange}
       />
 
       {/* Search Results Alert if filtered */}
@@ -204,12 +200,6 @@ function App() {
         </div>
       </section>
 
-      {/* Bikes Catalog Section */}
-      <BikesSection
-        t={t}
-        vehicles={vehicles}
-      />
-
       {/* About Section */}
       <section id="about" className="bg-white text-slate-900 py-24 px-4 sm:px-6 lg:px-8 border-t border-slate-100">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-12 items-center">
@@ -273,8 +263,25 @@ function App() {
 
       <Routes>
         <Route path="/korean-car/" element={<HomePage />} />
-        <Route path="/korean-car/cars" element={<CarsPage vehicles={vehicles} t={t} lang={lang} />} />
-        <Route path="/korean-car/bikes" element={<BikesPage vehicles={vehicles} t={t} lang={lang} />} />
+        <Route path="/korean-car/cars" element={
+          <CarsPage
+            vehicles={encarVehicles}
+            t={t}
+            lang={lang}
+            loading={loading}
+            hasMore={hasMore}
+            loadMore={loadMore}
+            manufacturers={manufacturers}
+            manufacturersLoading={manufacturersLoading}
+            modelGroups={modelGroups}
+            modelGroupsLoading={modelGroupsLoading}
+            models={models}
+            modelsLoading={modelsLoading}
+            fetchModelGroups={fetchModelGroups}
+            fetchModels={fetchModels}
+            setFilters={setEncarFilters}
+          />
+        } />
         <Route path="/korean-car/car/:id" element={<CarDetailsPage t={t} lang={lang} />} />
         {/* Fallback to home */}
         <Route path="*" element={<HomePage />} />

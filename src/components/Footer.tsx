@@ -120,11 +120,6 @@ export const Footer: React.FC<FooterProps> = ({ t, setActiveSection }) => {
               </button>
             </li>
             <li>
-              <button onClick={() => handleNavClick('bikes')} className="hover:text-white transition-colors">
-                {t.navBikes}
-              </button>
-            </li>
-            <li>
               <button onClick={() => handleNavClick('services')} className="hover:text-white transition-colors">
                 {t.navServices}
               </button>
