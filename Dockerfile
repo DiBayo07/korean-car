@@ -3,6 +3,15 @@ FROM node:20-slim AS builder
 
 WORKDIR /app
 
+# Python и build-essential нужны для сборки native-модуля better-sqlite3
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-dev \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV PYTHON=/usr/bin/python3
 ENV PUPPETEER_SKIP_DOWNLOAD=true
 
 # 1. Копируем package.json (из папки backend)
@@ -25,9 +34,11 @@ WORKDIR /app
 ENV NODE_ENV=production
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 
-# Устанавливаем Chromium (нужен Puppeteer'у на Encar)
+# Устанавливаем Chromium и зависимости для better-sqlite3
 RUN apt-get update && apt-get install -y \
     chromium \
+    python3 \
+    build-essential \
     fonts-liberation \
     libasound2 \
     libatk-bridge2.0-0 \
@@ -47,17 +58,25 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
+ENV PYTHON=/usr/bin/python3
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-# 5. Копируем собранные артефакты из builder
+# 5. Создаём папку для SQLite БД
+RUN mkdir -p /app/data
+
+# 6. Копируем собранные артефакты из builder
 COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
+COPY --from=builder /app/data ./data
 COPY --from=builder /app/dist ./dist
 
-# Удаляем devDependencies из финального образа (TypeScript, @nestjs/cli и т.д.)
+# 7. Пересобираем better-sqlite3 под целевую архитектуру (нужно после копирования node_modules)
+RUN npm rebuild better-sqlite3
+
+# Удаляем devDependencies из финального образа
 RUN npm prune --omit=dev
 
 EXPOSE 3000
 
-# 6. Запуск
+# 8. Запуск
 CMD ["node", "dist/main.js"]

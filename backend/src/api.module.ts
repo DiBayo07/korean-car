@@ -24,13 +24,10 @@ import { AppCacheModule } from './cache/cache.module';
     }),
     AppCacheModule,
     TypeOrmModule.forRoot({
-      type: 'postgres',
-      url: process.env.DATABASE_URL,
-      entities: [Car],
+      type: 'better-sqlite3',
+      database: (process.env.DATABASE_URL || 'data/cars.db').replace(/^sqlite:/, ''),
+      entities: [Car, EncarCar],
       synchronize: true,
-      ssl: process.env.DATABASE_URL?.includes('supabase')
-        ? { rejectUnauthorized: false }
-        : undefined,
     }),
     TypeOrmModule.forFeature([Car, EncarCar]),
   ],

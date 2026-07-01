@@ -1,14 +1,12 @@
 import { TypeOrmModuleOptions } from '@nestjs/typeorm';
 import { Car } from './entities/car.entity';
+import { EncarCar } from './entities/encar-car.entity';
 
 const ormconfig: TypeOrmModuleOptions = {
-  type: 'postgres',
-  url: process.env.DATABASE_URL,
-  entities: [Car],
+  type: 'better-sqlite3',
+  database: (process.env.DATABASE_URL || 'data/cars.db').replace(/^sqlite:/, ''),
+  entities: [Car, EncarCar],
   synchronize: true,
-  ssl: process.env.DATABASE_URL?.includes('supabase')
-    ? { rejectUnauthorized: false }
-    : undefined,
 };
 
 export default ormconfig;
