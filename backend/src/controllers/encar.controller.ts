@@ -30,6 +30,17 @@ export class CatalogController {
       return { success: false, data: { count: 0, results: [] } };
     }
   }
+
+  @Get('catalog/models/:manufacturerSlug/:modelGroupSlug')
+  async getModels(@Param('manufacturerSlug') manufacturerSlug: string, @Param('modelGroupSlug') modelGroupSlug: string) {
+    try {
+      const models = await this.databaseService.getModelsByManufacturerAndModelGroup(manufacturerSlug, modelGroupSlug);
+      return { success: true, data: { count: models.length, results: models } };
+    } catch (error) {
+      this.logger.error(`Failed to get models for ${manufacturerSlug}/${modelGroupSlug}: ${(error as Error).message}`);
+      return { success: false, data: { count: 0, results: [] } };
+    }
+  }
 }
 
 @Controller('api')

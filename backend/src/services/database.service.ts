@@ -313,4 +313,31 @@ export class DatabaseService {
       return { totalCars: 0, lastUpdated: null };
     }
   }
+
+  /**
+   * Returns models for a specific manufacturer and model group from encar_cars.
+   * Used for cascading dropdowns (generations).
+   */
+  async getModelsByManufacturerAndModelGroup(manufacturerSlug: string, modelGroupSlug: string): Promise<{ name: string; slug: string }[]> {
+    try {
+      const cars = await this.encarCarRepository
+        .createQueryBuilder('car')
+        .select('DISTINCT car.model', 'name')
+        .where('car.model IS NOT NULL')
+        .andWhere("car.model != ''")
+        .andWhere('LOWER(car.brand) LIKE LOWER(:manufacturerSlug)', { manufacturerSlug: `%${manufacturerSlug}%` })
+        .andWhere('LOWER(car.model) LIKE LOWER(:modelGroupSlug)', { modelGroupSlug: `%${modelGroupSlug}%` })
+        .groupBy('car.model')
+        .orderBy('car.model', 'ASC')
+        .getRawMany();
+
+      return cars.map((c: { name: string }) => ({
+        name: c.name,
+        slug: c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      }));
+    } catch (error) {
+      this.logger.error(`Failed to get models by manufacturer and model group: ${(error as Error).message}`);
+      return [];
+    }
+  }
 }

@@ -358,11 +358,20 @@ export async function listModelGroups(manufacturerSlug: string): Promise<{ count
 export async function listModels(manufacturerSlug: string, modelGroupSlug: string): Promise<{ count: number; results: CarapisModel[] }> {
   try {
     const res = await fetch(`${API_URL}/catalog/models/${encodeURIComponent(manufacturerSlug)}/${encodeURIComponent(modelGroupSlug)}`);
-    if (!res.ok) return { count: 0, results: [] };
+    if (!res.ok) {
+      console.error(`Failed to fetch models: ${res.status} ${res.statusText}`);
+      return { count: 0, results: [] };
+    }
     const data = await res.json();
-    if (!data.success) return { count: 0, results: [] };
-    return data.data || { count: 0, results: [] };
-  } catch {
+    if (!data.success) {
+      console.error('API returned error:', data.message);
+      return { count: 0, results: [] };
+    }
+    const results = data.data || { count: 0, results: [] };
+    console.log(`Loaded ${results.results?.length || 0} models for ${manufacturerSlug}/${modelGroupSlug}`);
+    return results;
+  } catch (error) {
+    console.error('Failed to fetch models:', error);
     return { count: 0, results: [] };
   }
 }
