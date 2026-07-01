@@ -1,28 +1,31 @@
-# Сборка (builder)
+# ========== Стадия сборки ==========
 FROM node:20-slim AS builder
 
 WORKDIR /app
 
-# PostgreSQL (pg) — pure JS, не требует native-сборки
 ENV PUPPETEER_SKIP_DOWNLOAD=true
 
-# 1. Копируем package.json ИЗ ПАПКИ backend
+# 1. Копируем package.json (из папки backend)
 COPY backend/package*.json ./
 
+# 2. Устанавливаем ВСЕ зависимости (включая dev)
 RUN npm ci
 
-# 2. Копируем ВЕСЬ код из папки backend
+# 3. Копируем исходный код (backend/ -> /app/)
 COPY backend/ ./
 
-# 3. Запускаем сборку (она создаст папку /app/dist)
+# 4. Собираем проект (результат в /app/dist/)
 RUN npm run build
 
-# --- Финальный образ ---
+# ========== Финальный образ ==========
 FROM node:20-slim
 
 WORKDIR /app
 
-# Установка Chromium и Python/build-essential для сборки better-sqlite3
+ENV NODE_ENV=production
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+
+# Устанавливаем Chromium (нужен Puppeteer'у на Encar)
 RUN apt-get update && apt-get install -y \
     chromium \
     fonts-liberation \
@@ -44,20 +47,17 @@ RUN apt-get update && apt-get install -y \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
-ENV NODE_ENV=production
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-# 4. Копируем package.json для продакшн-зависимостей
-COPY backend/package*.json ./
-
-# 5. Устанавливаем только продакшн-зависимости
-RUN npm ci --omit=dev
-
-# 6. Копируем СОБРАННУЮ папку dist из стадии builder
+# 5. Копируем собранные артефакты из builder
+COPY --from=builder /app/package*.json ./
+COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/dist ./dist
+
+# Удаляем devDependencies из финального образа (TypeScript, @nestjs/cli и т.д.)
+RUN npm prune --omit=dev
 
 EXPOSE 3000
 
-# 7. Запускаем собранный файл
+# 6. Запуск
 CMD ["node", "dist/main.js"]

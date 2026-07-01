@@ -1,0 +1,42 @@
+# Зависимости
+node_modules
+backend/node_modules
+
+# Сборка
+dist
+backend/dist
+*.tsbuildinfo
+
+# Git
+.git
+.gitignore
+
+# Окружение
+.env
+.env.*
+backend/.env
+backend/.env.*
+
+# Логи
+logs
+*.log
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+.DS_Store
+
+# Временные файлы
+tmp
+temp
+
+# Docker
+Dockerfile
+docker-compose.yml
+.dockerignore
+
+# Другое
+README.md
+*.md
