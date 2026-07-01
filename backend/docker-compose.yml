@@ -18,7 +18,7 @@ services:
       - BROWSER_POOL_SIZE=3
       - KRW_TO_USD_RATE=1350
       - CORS_ORIGIN=http://localhost:5173,http://localhost:3000,https://dibayo07.github.io,https://13.63.165.49.nip.io
-      - DATABASE_URL=./data/cars.db
+      - DATABASE_URL=/app/data/cars.db
     depends_on:
       - redis
     restart: unless-stopped

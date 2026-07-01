@@ -19,7 +19,7 @@ import { AppCacheModule } from './cache/cache.module';
     AppCacheModule,
     TypeOrmModule.forRoot({
       type: 'better-sqlite3',
-      database: (process.env.DATABASE_URL || 'data/cars.db').replace(/^sqlite:/, ''),
+      database: (process.env.DATABASE_URL || '/app/data/cars.db').replace(/^sqlite:/, ''),
       entities: [Car, EncarCar],
       synchronize: true,
     }),
