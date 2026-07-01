@@ -24,7 +24,7 @@ export interface AddCarsResult {
 
 export interface DbStats {
   totalCars: number;
-  lastUpdated: Date | null;
+  lastUpdated: string | null;
 }
 
 /**
@@ -295,16 +295,17 @@ export class DatabaseService {
 
   /**
    * Returns statistics about the database.
+   * Counts from encar_cars table where webhook data is stored.
    */
   async getStats(): Promise<DbStats> {
     try {
-      const totalCars = await this.carRepository.count();
-      const lastCar = await this.carRepository.findOne({
-        order: { updated_at: 'DESC' },
+      const totalCars = await this.encarCarRepository.count();
+      const lastCar = await this.encarCarRepository.findOne({
+        order: { date_post_updated: 'DESC' },
       });
       return {
         totalCars,
-        lastUpdated: lastCar?.updated_at || null,
+        lastUpdated: lastCar?.date_post_updated || null,
       };
     } catch (error) {
       this.logger.error(`Failed to get stats: ${(error as Error).message}`);
