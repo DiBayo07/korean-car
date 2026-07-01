@@ -70,7 +70,7 @@ export function useVehicles(initialFilters: UseVehiclesFilters = {}): UseVehicle
   const fetchModelGroups = useCallback(async (slug: string) => {
     setModelGroupsLoading(true);
     try {
-      const data = await listModelGroups(slug, { limit: 100 });
+      const data = await listModelGroups(slug);
       setModelGroups(data.results || []);
     } catch {
       setModelGroups([]);
@@ -82,7 +82,7 @@ export function useVehicles(initialFilters: UseVehiclesFilters = {}): UseVehicle
   const fetchModels = useCallback(async (manSlug: string, modelGroupSlug: string) => {
     setModelsLoading(true);
     try {
-      const data = await listModels(manSlug, modelGroupSlug, { limit: 100 });
+      const data = await listModels(manSlug, modelGroupSlug);
       setModels(data.results || []);
     } catch {
       setModels([]);

@@ -273,6 +273,24 @@ export async function getVehicleDetail(id: string | number): Promise<EncarDetail
   }
 }
 
+// ─── Admin / Stats ───────────────────────────────────────────────────────
+
+export interface StatsResponse {
+  totalCars: number;
+  lastUpdated: string | null;
+}
+
+export async function getStats(): Promise<StatsResponse | null> {
+  try {
+    const res = await fetch(`${API_URL}/admin/stats`);
+    if (!res.ok) return null;
+    const data = await res.json();
+    return data.success ? data.data : null;
+  } catch {
+    return null;
+  }
+}
+
 // ─── Catalog API (via backend) ────────────────────────────────────────────
 
 export interface CarapisManufacturer {

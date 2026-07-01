@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Search, Calendar, Gauge, DollarSign } from 'lucide-react';
+import { Search, Calendar, Gauge, DollarSign, SlidersHorizontal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { translateBrandName } from '../api/encarApi';
 import type { CarapisManufacturer, CarapisModelGroup, CarapisModel } from '../api/encarApi';
@@ -29,6 +29,12 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, 
   const [selectedBrand, setSelectedBrand] = useState('');
   const [selectedModel, setSelectedModel] = useState('');
   const [selectedGeneration, setSelectedGeneration] = useState('');
+  const [showAdvancedFilters, setShowAdvancedFilters] = useState(false);
+  const [searchText, setSearchText] = useState('');
+  const [yearFrom, setYearFrom] = useState('');
+  const [yearTo, setYearTo] = useState('');
+  const [priceFrom, setPriceFrom] = useState('');
+  const [priceTo, setPriceTo] = useState('');
 
   const sortedManufacturers = [...manufacturers]
     .map(m => ({ ...m, translatedName: translateBrandName(m.name) }))
@@ -39,6 +45,11 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, 
     setSelectedBrand('');
     setSelectedModel('');
     setSelectedGeneration('');
+    setSearchText('');
+    setYearFrom('');
+    setYearTo('');
+    setPriceFrom('');
+    setPriceTo('');
     setFilters({});
   };
 
@@ -129,7 +140,19 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, 
 
           {/* Clear / Count */}
           <div className="flex items-center gap-3">
-            {(selectedBrand || selectedModel || selectedGeneration) && (
+            {/* Toggle Advanced Filters */}
+            <button
+              onClick={() => setShowAdvancedFilters(!showAdvancedFilters)}
+              className={`px-3 py-2.5 rounded-xl border text-xs font-bold transition-all ${
+                showAdvancedFilters || searchText || yearFrom || yearTo || priceFrom || priceTo
+                  ? 'bg-kg-gold/20 text-kg-gold border-kg-gold/30'
+                  : 'border-white/10 text-slate-300 hover:bg-white/5'
+              }`}
+              title={lang === 'en' ? 'Advanced filters' : lang === 'ru' ? 'Расширенные фильтры' : 'Кеңейтилген чыпкалар'}
+            >
+              <SlidersHorizontal size={16} />
+            </button>
+            {(selectedBrand || selectedModel || selectedGeneration || searchText || yearFrom || yearTo || priceFrom || priceTo) && (
               <button
                 onClick={clearFilters}
                 className="px-4 py-2.5 rounded-xl border border-white/10 text-xs font-bold text-slate-300 hover:bg-white/5 transition-all"
@@ -143,6 +166,121 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, 
           </div>
         </div>
       </div>
+
+      {/* Advanced Filters Section */}
+      {showAdvancedFilters && (
+        <div className="bg-slate-950/95 backdrop-blur-md border-b border-white/5 py-4 px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+              {/* Search text */}
+              <div className="flex flex-col bg-[#121824] rounded-xl px-3 py-2 border border-white/5">
+                <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">{lang === 'en' ? 'SEARCH' : lang === 'ru' ? 'ПОИСК' : 'ИЗДӨӨ'}</span>
+                <input
+                  type="text"
+                  value={searchText}
+                  onChange={(e) => setSearchText(e.target.value)}
+                  placeholder={lang === 'en' ? 'Brand or model...' : lang === 'ru' ? 'Марка или модель...' : 'Марка же модел...'}
+                  className="bg-transparent text-white text-sm font-semibold focus:outline-none placeholder:text-slate-600"
+                />
+              </div>
+
+              {/* Year from */}
+              <div className="flex flex-col bg-[#121824] rounded-xl px-3 py-2 border border-white/5">
+                <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">{lang === 'en' ? 'YEAR FROM' : lang === 'ru' ? 'ГОД ОТ' : 'ЖЫЛДАН'}</span>
+                <input
+                  type="number"
+                  value={yearFrom}
+                  onChange={(e) => setYearFrom(e.target.value)}
+                  min="2000" max="2026"
+                  placeholder={lang === 'en' ? 'e.g. 2020' : 'e.g. 2020'}
+                  className="bg-transparent text-white text-sm font-semibold focus:outline-none placeholder:text-slate-600"
+                />
+              </div>
+
+              {/* Year to */}
+              <div className="flex flex-col bg-[#121824] rounded-xl px-3 py-2 border border-white/5">
+                <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">{lang === 'en' ? 'YEAR TO' : lang === 'ru' ? 'ГОД ДО' : 'ЖЫЛГА ЧЕЙИН'}</span>
+                <input
+                  type="number"
+                  value={yearTo}
+                  onChange={(e) => setYearTo(e.target.value)}
+                  min="2000" max="2026"
+                  placeholder={lang === 'en' ? 'e.g. 2025' : 'e.g. 2025'}
+                  className="bg-transparent text-white text-sm font-semibold focus:outline-none placeholder:text-slate-600"
+                />
+              </div>
+
+              {/* Price from */}
+              <div className="flex flex-col bg-[#121824] rounded-xl px-3 py-2 border border-white/5">
+                <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">{lang === 'en' ? 'PRICE FROM, $' : lang === 'ru' ? 'ЦЕНА ОТ, $' : 'БААДАН, $'}</span>
+                <input
+                  type="number"
+                  value={priceFrom}
+                  onChange={(e) => setPriceFrom(e.target.value)}
+                  min="0"
+                  placeholder={lang === 'en' ? 'e.g. 5000' : 'e.g. 5000'}
+                  className="bg-transparent text-white text-sm font-semibold focus:outline-none placeholder:text-slate-600"
+                />
+              </div>
+
+              {/* Price to */}
+              <div className="flex flex-col bg-[#121824] rounded-xl px-3 py-2 border border-white/5">
+                <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">{lang === 'en' ? 'PRICE TO, $' : lang === 'ru' ? 'ЦЕНА ДО, $' : 'БААГА ЧЕЙИН, $'}</span>
+                <input
+                  type="number"
+                  value={priceTo}
+                  onChange={(e) => setPriceTo(e.target.value)}
+                  min="0"
+                  placeholder={lang === 'en' ? 'e.g. 30000' : 'e.g. 30000'}
+                  className="bg-transparent text-white text-sm font-semibold focus:outline-none placeholder:text-slate-600"
+                />
+              </div>
+            </div>
+
+            {/* Apply button */}
+            <div className="flex justify-end mt-3 gap-2">
+              <button
+                onClick={() => {
+                  const filters: any = {};
+                  const man = manufacturers.find(m => translateBrandName(m.name) === selectedBrand || m.slug === selectedBrand);
+                  if (man) filters.manufacturer_slug = man.slug;
+                  const mg = modelGroups.find(mg => mg.name === selectedModel || mg.slug === selectedModel);
+                  if (man && mg) filters.model_group_slug = mg.slug;
+                  const mod = models.find(m => m.name === selectedGeneration || m.slug === selectedGeneration);
+                  if (man && mg && mod) filters.model_slug = mod.slug;
+                  if (searchText.trim()) filters.search = searchText.trim();
+                  if (yearFrom.trim()) filters.min_year = parseInt(yearFrom.trim(), 10);
+                  if (yearTo.trim()) filters.max_year = parseInt(yearTo.trim(), 10);
+                  if (priceFrom.trim()) filters.price_from = parseInt(priceFrom.trim(), 10);
+                  if (priceTo.trim()) filters.price_to = parseInt(priceTo.trim(), 10);
+                  setFilters(filters);
+                }}
+                className="px-6 py-2 bg-kg-gold hover:bg-yellow-500 text-brand-950 font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all active:scale-95 shadow-lg"
+              >
+                {lang === 'en' ? 'Apply Filters' : lang === 'ru' ? 'Применить' : 'Колдонуу'}
+              </button>
+              {(searchText || yearFrom || yearTo || priceFrom || priceTo) && (
+                <button
+                  onClick={() => {
+                    setSearchText('');
+                    setYearFrom('');
+                    setYearTo('');
+                    setPriceFrom('');
+                    setPriceTo('');
+                    setFilters({});
+                    setSelectedBrand('');
+                    setSelectedModel('');
+                    setSelectedGeneration('');
+                  }}
+                  className="px-4 py-2 rounded-xl border border-white/10 text-xs font-bold text-slate-300 hover:bg-white/5 transition-all"
+                >
+                  {lang === 'en' ? 'Reset' : lang === 'ru' ? 'Сбросить всё' : 'Баарын тазалоо'}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Cars Grid */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
