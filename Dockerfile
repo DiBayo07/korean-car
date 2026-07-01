@@ -30,7 +30,7 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# Установка Chromium
+# Установка Chromium и Python/build-essential для сборки better-sqlite3
 RUN apt-get update && apt-get install -y \
     chromium \
     fonts-liberation \
@@ -49,10 +49,14 @@ RUN apt-get update && apt-get install -y \
     libxdamage1 \
     libxrandr2 \
     xdg-utils \
+    python3 \
+    python3-dev \
+    build-essential \
     --no-install-recommends \
     && rm -rf /var/lib/apt/lists/*
 
 ENV NODE_ENV=production
+ENV PYTHON=/usr/bin/python3
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
