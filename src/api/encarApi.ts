@@ -2,6 +2,7 @@
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
 const KRW_TO_USD = 1350;
+const BASE_IMAGE_URL = 'https://ci.encar.com/carpicture';
 
 // Types matching backend response
 export interface SearchResultItem {
@@ -166,16 +167,39 @@ const BRAND_MAP: Record<string, string> = {
   '랜드로버': 'Land Rover',
   '마쯔다': 'Mazda',
   '스바루': 'Subaru',
+  '벤츠': 'Mercedes-Benz',
+  '미니': 'Mini',
+  '링컨': 'Lincoln',
+  '지프': 'Jeep',
+  '푸조': 'Peugeot',
+  '시트로엥': 'Citroen',
+  '픽업트럭': 'Pickup',
 };
 
 export function translateBrandName(koreanName: string): string {
   return BRAND_MAP[koreanName] || koreanName;
 }
 
+/**
+ * Преобразует путь к изображению в полный URL.
+ * Если путь уже начинается с http:// или https://, возвращает как есть.
+ * Если путь относительный (начинается с /), добавляет базовый URL.
+ */
+export function getFullImageUrl(path: string | undefined | null): string {
+  if (!path) return '';
+  if (path.startsWith('http://') || path.startsWith('https://')) return path;
+  // Если путь уже содержит base URL (например, сохранён с префиксом ранее)
+  if (path.includes('ci.encar.com')) return path.startsWith('http') ? path : `https:${path}`;
+  // Относительный путь: добавляем базовый URL
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  return `${BASE_IMAGE_URL}${cleanPath}`;
+}
+
 // Map backend search result to EncarVehicle
 function mapSearchItem(item: SearchResultItem): EncarVehicle {
   const brand = item.brand || item.title.split(' ')[0] || '';
   const model = item.model || item.title.split(' ').slice(1).join(' ') || '';
+  const images = (item.images || []).map(getFullImageUrl);
   return {
     id: item.id,
     type: item.type === 'moto' ? 'bike' : 'car',
@@ -187,9 +211,9 @@ function mapSearchItem(item: SearchResultItem): EncarVehicle {
     mileage: item.mileage,
     price_usd: item.price ? Math.round(item.price / KRW_TO_USD) : 0,
     price_krw: item.price,
-    image_url: item.images[0] || '',
-    images: item.images,
-    thumbnail: item.images[0],
+    image_url: getFullImageUrl(item.images[0]),
+    images,
+    thumbnail: getFullImageUrl(item.images[0]),
     status: 'Available',
     fuel: item.fuel,
     transmission: item.transmission,
@@ -248,8 +272,8 @@ export async function getVehicleDetail(id: string | number): Promise<EncarDetail
       mileage: d.mileage,
       fuel: d.fuel,
       transmission: d.transmission,
-      images: d.images,
-      thumbnail: d.images[0],
+      images: (d.images || []).map(getFullImageUrl),
+      thumbnail: getFullImageUrl(d.images[0]),
       specifications: d.specifications,
       sourceUrl: d.sourceUrl,
       source: 'encar',

@@ -1,5 +1,4 @@
 import { Controller, Get, Post, Param, Query, Logger } from '@nestjs/common';
-import { CarapisService } from '../services/carapis.service';
 import { ItemService, SearchService } from '../services/encar-api.service';
 import { DatabaseService } from '../services/database.service';
 import type { SearchQuery } from '../types/encar.types';
@@ -8,14 +7,15 @@ import type { SearchQuery } from '../types/encar.types';
 export class CatalogController {
   private readonly logger = new Logger(CatalogController.name);
 
-  constructor(private readonly carapis: CarapisService) {}
+  constructor(private readonly databaseService: DatabaseService) {}
 
   @Get('catalog/manufacturers')
-  async getManufacturers(@Query('country') country?: string) {
+  async getManufacturers() {
     try {
-      const data = await this.carapis.getManufacturers({ country: country || 'KR', limit: 100 });
-      return { success: true, data };
-    } catch {
+      const brands = await this.databaseService.getDistinctBrands();
+      return { success: true, data: { count: brands.length, results: brands } };
+    } catch (error) {
+      this.logger.error(`Failed to get brands: ${(error as Error).message}`);
       return { success: false, data: { count: 0, results: [] } };
     }
   }
@@ -23,19 +23,10 @@ export class CatalogController {
   @Get('catalog/model-groups/:slug')
   async getModelGroups(@Param('slug') slug: string) {
     try {
-      const data = await this.carapis.getModelGroups(slug, { limit: 100 });
-      return { success: true, data };
-    } catch {
-      return { success: false, data: { count: 0, results: [] } };
-    }
-  }
-
-  @Get('catalog/models/:manSlug/:modelSlug')
-  async getModels(@Param('manSlug') manSlug: string, @Param('modelSlug') modelSlug: string) {
-    try {
-      const data = await this.carapis.getModels(manSlug, modelSlug, { limit: 100 });
-      return { success: true, data };
-    } catch {
+      const models = await this.databaseService.getModelsByBrand(slug);
+      return { success: true, data: { count: models.length, results: models } };
+    } catch (error) {
+      this.logger.error(`Failed to get models for ${slug}: ${(error as Error).message}`);
       return { success: false, data: { count: 0, results: [] } };
     }
   }

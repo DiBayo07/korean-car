@@ -244,6 +244,56 @@ export class DatabaseService {
   }
 
   /**
+   * Returns distinct brands from the encar_cars table.
+   */
+  async getDistinctBrands(): Promise<{ name: string; slug: string }[]> {
+    try {
+      const cars = await this.encarCarRepository
+        .createQueryBuilder('car')
+        .select('car.brand', 'name')
+        .where('car.brand IS NOT NULL')
+        .andWhere("car.brand != ''")
+        .groupBy('LOWER(car.brand)')
+        .orderBy('car.brand', 'ASC')
+        .getRawMany();
+
+      return cars.map((c: { name: string }) => ({
+        name: c.name,
+        slug: c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      }));
+    } catch (error) {
+      this.logger.error(`Failed to get distinct brands: ${(error as Error).message}`);
+      return [];
+    }
+  }
+
+  /**
+   * Returns unique models for a given brand from the encar_cars table.
+   * Matching is case-insensitive.
+   */
+  async getModelsByBrand(brandSlug: string): Promise<{ name: string; slug: string }[]> {
+    try {
+      const cars = await this.encarCarRepository
+        .createQueryBuilder('car')
+        .select('car.model', 'name')
+        .where('car.model IS NOT NULL')
+        .andWhere("car.model != ''")
+        .andWhere('LOWER(car.brand) = LOWER(:brandSlug)', { brandSlug })
+        .groupBy('LOWER(car.model)')
+        .orderBy('car.model', 'ASC')
+        .getRawMany();
+
+      return cars.map((c: { name: string }) => ({
+        name: c.name,
+        slug: c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      }));
+    } catch (error) {
+      this.logger.error(`Failed to get models by brand: ${(error as Error).message}`);
+      return [];
+    }
+  }
+
+  /**
    * Returns statistics about the database.
    */
   async getStats(): Promise<DbStats> {

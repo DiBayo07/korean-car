@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Search, Calendar, Gauge, DollarSign, SlidersHorizontal } from 'lucide-react';
 import { Link } from 'react-router-dom';
-import { translateBrandName } from '../api/encarApi';
+import { translateBrandName, getFullImageUrl } from '../api/encarApi';
 import type { CarapisManufacturer, CarapisModelGroup, CarapisModel } from '../api/encarApi';
 import type { EncarVehicle } from '../api/encarApi';
 import type { Language, TranslationDict } from '../lib/translations';
@@ -311,9 +311,10 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, 
                   {/* Image */}
                   <div className="relative aspect-[16/10] overflow-hidden">
                     <img
-                      src={car.image_url}
+                      src={getFullImageUrl(car.image_url)}
                       alt={`${car.brand} ${car.model}`}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                      onError={(e) => { (e.target as HTMLImageElement).src = 'https://via.placeholder.com/400x300?text=No+Image'; }}
                     />
                     {/* Brand badge */}
                     <span className="absolute top-3 left-3 px-2.5 py-1 bg-black/60 backdrop-blur-sm text-[10px] font-bold text-white rounded-lg border border-white/10">
