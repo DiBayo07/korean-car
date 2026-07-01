@@ -3,10 +3,20 @@ FROM node:20-slim AS builder
 
 WORKDIR /app
 
+# Установка Python и build-essential для сборки native-модулей (better-sqlite3 требует node-gyp)
+RUN apt-get update && apt-get install -y \
+    python3 \
+    python3-pip \
+    python3-dev \
+    build-essential \
+    && rm -rf /var/lib/apt/lists/*
+
+ENV PYTHON=/usr/bin/python3
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+
 # 1. Копируем package.json ИЗ ПАПКИ backend
 COPY backend/package*.json ./
 
-ENV PUPPETEER_SKIP_DOWNLOAD=true
 RUN npm ci
 
 # 2. Копируем ВЕСЬ код из папки backend
@@ -20,7 +30,7 @@ FROM node:20-slim
 
 WORKDIR /app
 
-# Установка Chromium (как у вас было)
+# Установка Chromium
 RUN apt-get update && apt-get install -y \
     chromium \
     fonts-liberation \
@@ -46,7 +56,7 @@ ENV NODE_ENV=production
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/chromium
 
-# 4. Копируем package.json для продакшн-зависимостей (ОПЯТЬ ИЗ ПАПКИ backend)
+# 4. Копируем package.json для продакшн-зависимостей
 COPY backend/package*.json ./
 
 # 5. Устанавливаем только продакшн-зависимости
