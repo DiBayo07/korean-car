@@ -26,20 +26,13 @@ export class SearchService {
       return { total: 0, page, limit, items: [] };
     }
 
-    // Check if we need to fetch new data from Apify
-    const totalInDb = await this.databaseService.getTotalCount();
-    if (totalInDb < DB_MIN_CARS_THRESHOLD) {
-      this.logger.log(`Only ${totalInDb} cars in DB, fetching from Apify...`);
-      await this.fetchAndStoreFromApify();
-    }
-
     // Check 5-min cache for this specific query
     const cacheKey = `search:db:${JSON.stringify({ ...query, page, limit })}`;
     const cached = await this.cacheService.get<SearchResponseDto>(cacheKey);
     if (cached) return cached;
 
     try {
-      // Query from database
+      // Query from encar_cars table (webhook data)
       const result = await this.databaseService.getCars({
         brand: query.brand,
         model: query.model,
