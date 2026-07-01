@@ -7,8 +7,15 @@ import * as path from 'path';
 async function bootstrap() {
   // Создаём директорию для SQLite БД, если её нет
   const dataDir = path.join(__dirname, '..', 'data');
+  // Для Render/Docker используем абсолютный путь /app/data
+  const absoluteDataDir = '/app/data';
+  
+  // Создаём обе директории для совместимости
   if (!fs.existsSync(dataDir)) {
     fs.mkdirSync(dataDir, { recursive: true });
+  }
+  if (!fs.existsSync(absoluteDataDir)) {
+    fs.mkdirSync(absoluteDataDir, { recursive: true });
   }
 
   const app = await NestFactory.create(AppModule, {

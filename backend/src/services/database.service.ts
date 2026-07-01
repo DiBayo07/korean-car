@@ -267,4 +267,50 @@ export class DatabaseService {
       throw error;
     }
   }
+
+  /**
+   * Returns unique models for a given brand from the encar_cars table.
+   * Uses LIKE for case-insensitive matching.
+   */
+  async getModelsByBrand(brandSlug: string): Promise<{ name: string; slug: string }[]> {
+    try {
+      const cars = await this.encarCarRepository
+        .createQueryBuilder('car')
+        .select('DISTINCT car.model', 'name')
+        .where('car.model IS NOT NULL')
+        .andWhere("car.model != ''")
+        .andWhere('LOWER(car.brand) LIKE LOWER(:brandSlug)', { brandSlug: `%${brandSlug}%` })
+        .groupBy('car.model')
+        .orderBy('car.model', 'ASC')
+        .getRawMany();
+
+      return cars.map((c: { name: string }) => ({
+        name: c.name,
+        slug: c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+      }));
+    } catch (error) {
+      this.logger.error(`Failed to get models by brand: ${(error as Error).message}`);
+      return [];
+    }
+  }
+
+  /**
+   * Returns statistics about the database.
+   * Counts from encar_cars table where webhook data is stored.
+   */
+  async getStats(): Promise<DbStats> {
+    try {
+      const totalCars = await this.encarCarRepository.count();
+      const lastCar = await this.encarCarRepository.findOne({
+        order: { date_post_updated: 'DESC' },
+      });
+      return {
+        totalCars,
+        lastUpdated: lastCar?.date_post_updated || null,
+      };
+    } catch (error) {
+      this.logger.error(`Failed to get stats: ${(error as Error).message}`);
+      return { totalCars: 0, lastUpdated: null };
+    }
+  }
 }
