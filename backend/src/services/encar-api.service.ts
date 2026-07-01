@@ -55,14 +55,14 @@ export class SearchService {
 
       const items: SearchItemDto[] = result.items.map((car) => ({
         id: car.id,
-        title: car.title,
-        price: car.price,
-        year: car.year,
-        mileage: car.mileage,
-        fuel: car.fuel,
-        transmission: car.transmission,
-        images: car.imageArray,
-        thumbnail: car.imageArray[0] || '',
+        title: car.brand && car.model ? `${car.brand} ${car.model}` : 'Unknown',
+        price: car.price || 0,
+        year: car.year || 0,
+        mileage: car.mileage || 0,
+        fuel: car.fuel || '',
+        transmission: car.transmission || '',
+        images: car.photos || [],
+        thumbnail: car.photos?.[0] || '',
         source: 'encar' as const,
         brand: car.brand,
         model: car.model,
@@ -144,17 +144,20 @@ export class ItemService {
       if (car.transmission) specs['Transmission'] = car.transmission;
       if (car.mileage) specs['Mileage'] = `${car.mileage.toLocaleString()} km`;
       if (car.year) specs['Year'] = String(car.year);
+      if (car.body_type) specs['Body Type'] = car.body_type;
+      if (car.color) specs['Color'] = car.color;
+      if (car.displacement) specs['Displacement'] = `${car.displacement}cc`;
 
       return {
         id: car.id,
-        title: car.title,
+        title: car.brand && car.model ? `${car.brand} ${car.model}` : 'Unknown',
         description: '',
-        price: car.price,
-        year: car.year,
-        mileage: car.mileage,
-        fuel: car.fuel,
-        transmission: car.transmission,
-        images: car.imageArray,
+        price: car.price || 0,
+        year: car.year || 0,
+        mileage: car.mileage || 0,
+        fuel: car.fuel || '',
+        transmission: car.transmission || '',
+        images: car.photos || [],
         specifications: specs,
         sourceUrl: `https://www.encar.com/ve/${car.id}`,
         source: 'encar',

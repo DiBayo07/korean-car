@@ -167,7 +167,6 @@ const BRAND_MAP: Record<string, string> = {
   '랜드로버': 'Land Rover',
   '마쯔다': 'Mazda',
   '스바루': 'Subaru',
-  '벤츠': 'Mercedes-Benz',
   '미니': 'Mini',
   '링컨': 'Lincoln',
   '지프': 'Jeep',

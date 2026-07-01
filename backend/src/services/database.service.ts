@@ -106,64 +106,18 @@ export class DatabaseService {
   }
 
   /**
-   * Returns the total count of cars in the database.
+   * Returns the total count of cars in the encar_cars table (webhook data).
    */
   async getTotalCount(): Promise<number> {
-    return this.carRepository.count();
+    return this.encarCarRepository.count();
   }
 
   /**
-   * Searches cars by the given filters with pagination.
-   * Supports brand, model, year range, price range, fuel, transmission.
+   * Gets a single car by its id from encar_cars table. Returns null if not found.
    */
-  async getCars(filters: CarFilters = {}): Promise<{ items: Car[]; total: number }> {
-    const {
-      brand, model, yearFrom, yearTo, priceFrom, priceTo, fuel, transmission,
-      limit = 20, offset = 0,
-    } = filters;
-
-    const where: Record<string, unknown> = {};
-    if (brand) where.brand = Like(`%${brand}%`);
-    if (model) where.model = Like(`%${model}%`);
-    if (fuel) where.fuel = Like(`%${fuel}%`);
-    if (transmission) where.transmission = Like(`%${transmission}%`);
-
-    if (yearFrom !== undefined && yearTo !== undefined) {
-      where.year = Between(yearFrom, yearTo);
-    } else if (yearFrom !== undefined) {
-      where.year = MoreThanOrEqual(yearFrom);
-    } else if (yearTo !== undefined) {
-      where.year = LessThanOrEqual(yearTo);
-    }
-
-    if (priceFrom !== undefined && priceTo !== undefined) {
-      where.price = Between(priceFrom, priceTo);
-    } else if (priceFrom !== undefined) {
-      where.price = MoreThanOrEqual(priceFrom);
-    } else if (priceTo !== undefined) {
-      where.price = LessThanOrEqual(priceTo);
-    }
-
+  async getCarById(id: string): Promise<EncarCar | null> {
     try {
-      const [items, total] = await this.carRepository.findAndCount({
-        where,
-        order: { updated_at: 'DESC' },
-        take: Math.min(limit, 100),
-        skip: offset,
-      });
-      return { items, total };
-    } catch (error) {
-      this.logger.error(`Failed to query cars: ${(error as Error).message}`);
-      throw error;
-    }
-  }
-
-  /**
-   * Gets a single car by its id. Returns null if not found.
-   */
-  async getCarById(id: string): Promise<Car | null> {
-    try {
-      return await this.carRepository.findOneBy({ id });
+      return await this.encarCarRepository.findOneBy({ id });
     } catch (error) {
       this.logger.error(`Failed to get car ${id}: ${(error as Error).message}`);
       throw error;
@@ -268,48 +222,49 @@ export class DatabaseService {
   }
 
   /**
-   * Returns unique models for a given brand from the encar_cars table.
-   * Matching is case-insensitive.
+   * Searches encar_cars by the given filters with pagination.
+   * Supports brand, model, year range, price range, fuel, transmission.
+   * This is the primary search method for webhook data.
    */
-  async getModelsByBrand(brandSlug: string): Promise<{ name: string; slug: string }[]> {
-    try {
-      const cars = await this.encarCarRepository
-        .createQueryBuilder('car')
-        .select('car.model', 'name')
-        .where('car.model IS NOT NULL')
-        .andWhere("car.model != ''")
-        .andWhere('LOWER(car.brand) = LOWER(:brandSlug)', { brandSlug })
-        .groupBy('LOWER(car.model)')
-        .orderBy('car.model', 'ASC')
-        .getRawMany();
+  async getCars(filters: CarFilters = {}): Promise<{ items: EncarCar[]; total: number }> {
+    const {
+      brand, model, yearFrom, yearTo, priceFrom, priceTo, fuel, transmission,
+      limit = 20, offset = 0,
+    } = filters;
 
-      return cars.map((c: { name: string }) => ({
-        name: c.name,
-        slug: c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-      }));
-    } catch (error) {
-      this.logger.error(`Failed to get models by brand: ${(error as Error).message}`);
-      return [];
+    const where: Record<string, unknown> = {};
+    if (brand) where.brand = Like(`%${brand}%`);
+    if (model) where.model = Like(`%${model}%`);
+    if (fuel) where.fuel = Like(`%${fuel}%`);
+    if (transmission) where.transmission = Like(`%${transmission}%`);
+
+    if (yearFrom !== undefined && yearTo !== undefined) {
+      where.year = Between(yearFrom, yearTo);
+    } else if (yearFrom !== undefined) {
+      where.year = MoreThanOrEqual(yearFrom);
+    } else if (yearTo !== undefined) {
+      where.year = LessThanOrEqual(yearTo);
     }
-  }
 
-  /**
-   * Returns statistics about the database.
-   * Counts from encar_cars table where webhook data is stored.
-   */
-  async getStats(): Promise<DbStats> {
+    if (priceFrom !== undefined && priceTo !== undefined) {
+      where.price = Between(priceFrom, priceTo);
+    } else if (priceFrom !== undefined) {
+      where.price = MoreThanOrEqual(priceFrom);
+    } else if (priceTo !== undefined) {
+      where.price = LessThanOrEqual(priceTo);
+    }
+
     try {
-      const totalCars = await this.encarCarRepository.count();
-      const lastCar = await this.encarCarRepository.findOne({
+      const [items, total] = await this.encarCarRepository.findAndCount({
+        where,
         order: { date_post_updated: 'DESC' },
+        take: Math.min(limit, 100),
+        skip: offset,
       });
-      return {
-        totalCars,
-        lastUpdated: lastCar?.date_post_updated || null,
-      };
+      return { items, total };
     } catch (error) {
-      this.logger.error(`Failed to get stats: ${(error as Error).message}`);
-      return { totalCars: 0, lastUpdated: null };
+      this.logger.error(`Failed to query encar_cars: ${(error as Error).message}`);
+      throw error;
     }
   }
 }
