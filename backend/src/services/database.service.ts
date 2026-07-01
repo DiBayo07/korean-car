@@ -2,6 +2,7 @@ import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, Between, In, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { Car } from '../entities/car.entity';
+import { EncarCar } from '../entities/encar-car.entity';
 
 export interface CarFilters {
   brand?: string;
@@ -50,6 +51,8 @@ export class DatabaseService {
   constructor(
     @InjectRepository(Car)
     private readonly carRepository: Repository<Car>,
+    @InjectRepository(EncarCar)
+    private readonly encarCarRepository: Repository<EncarCar>,
   ) {}
 
   /**
@@ -165,6 +168,79 @@ export class DatabaseService {
       this.logger.error(`Failed to get car ${id}: ${(error as Error).message}`);
       throw error;
     }
+  }
+
+  /**
+   * Сохраняет или обновляет массив машин из вебхука Encar (36789.ru).
+   * Использует upsert на основе id. При ошибке конкретной машины — логирует и продолжает.
+   */
+  async saveEncarCars(cars: any[]): Promise<{ saved: number; failed: number }> {
+    let saved = 0;
+    let failed = 0;
+
+    for (const raw of cars) {
+      try {
+        const ids = raw.ids || {};
+        const general = raw.general || {};
+        const carId = ids.id;
+        if (!carId) {
+          this.logger.warn('Car without id, skipping');
+          failed++;
+          continue;
+        }
+
+        const formattedPhotos = Array.isArray(raw.photos)
+          ? raw.photos.map(
+              (p: string) =>
+                `https://ci.encar.com/carpicture${p.startsWith('/') ? '' : '/'}${p}`,
+            )
+          : [];
+
+        const encarCar: Partial<EncarCar> = {
+          id: carId,
+          donor_inner_id: ids.donor_inner_id || null,
+          vin: ids.vin || null,
+          vehicle_no: ids.vehicle_no || null,
+          brand: general.brand?.en || null,
+          model: general.model?.en || null,
+          price: general.price ?? null,
+          mileage: general.mileage ?? null,
+          year: general.model_year ?? null,
+          fuel: general.fuel_type?.en || null,
+          transmission: general.transmission_type?.en || null,
+          body_type: general.body_type?.en || null,
+          color: general.exterior_color?.en || null,
+          interior_color: general.interior_color?.en || null,
+          displacement: general.displacement ?? null,
+          seat_count: general.seat_count ?? null,
+          has_accidents: general.has_accidents ?? null,
+          accident_count: general.accident_count ?? null,
+          has_repairs: general.has_repairs ?? null,
+          has_painting: general.has_painting ?? null,
+          repairs_total_cost: general.repairs_total_cost ?? null,
+          has_waterlog: general.has_waterlog ?? null,
+          owner_changes_count: general.owner_changes_count ?? null,
+          date_car_registration: general.date_car_registration || null,
+          date_post_created: general.date_post_created || null,
+          date_post_updated: general.date_post_updated || null,
+          photos: formattedPhotos,
+          options: raw.options || null,
+          diagnosis: raw.diagnosis || null,
+          inspection: raw.inspection || null,
+        };
+
+        await this.encarCarRepository.upsert(encarCar, ['id']);
+        saved++;
+      } catch (error) {
+        this.logger.error(
+          `Failed to save EncarCar: ${(error as Error).message}`,
+        );
+        failed++;
+      }
+    }
+
+    this.logger.log(`EncarCars saved: ${saved}, failed: ${failed}`);
+    return { saved, failed };
   }
 
   /**
