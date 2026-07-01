@@ -1,6 +1,7 @@
-import { Controller, Get, Param, Query, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Param, Query, Logger } from '@nestjs/common';
 import { CarapisService } from '../services/carapis.service';
 import { ItemService, SearchService } from '../services/encar-api.service';
+import { DatabaseService } from '../services/database.service';
 import type { SearchQuery } from '../types/encar.types';
 
 @Controller('api')
@@ -89,11 +90,10 @@ export class ItemController {
   constructor(private readonly itemService: ItemService) {}
 
   @Get('item/:id')
-  async getItem(@Param('id') id: string, @Query('type') type?: string) {
+  async getItem(@Param('id') id: string) {
     try {
-      const vehicleType = type === 'moto' || type === 'bike' ? 'moto' : 'car';
-      this.logger.debug(`Item request: ${id} (${vehicleType})`);
-      const detail = await this.itemService.getItem(id, vehicleType);
+      this.logger.debug(`Item request: ${id}`);
+      const detail = await this.itemService.getItem(id);
       return { success: true, data: detail };
     } catch (error) {
       this.logger.error(`Item ${id} failed: ${(error as Error).message}`);
@@ -108,6 +108,48 @@ export class ItemController {
       return detail;
     } catch {
       return { success: false, message: 'Item not found.' };
+    }
+  }
+}
+
+@Controller('api/admin')
+export class AdminController {
+  private readonly logger = new Logger(AdminController.name);
+
+  constructor(
+    private readonly searchService: SearchService,
+    private readonly databaseService: DatabaseService,
+  ) {}
+
+  @Get('stats')
+  async getStats() {
+    try {
+      const stats = await this.databaseService.getStats();
+      return { success: true, data: stats };
+    } catch (error) {
+      this.logger.error(`Admin stats failed: ${(error as Error).message}`);
+      return { success: false, message: 'Failed to get stats.' };
+    }
+  }
+
+  @Post('refresh')
+  async refresh() {
+    try {
+      this.logger.log('Admin refresh triggered');
+      const result = await this.searchService.fetchAndStoreFromApify();
+      const stats = await this.databaseService.getStats();
+      return {
+        success: true,
+        data: {
+          added: result.added,
+          skipped: result.skipped,
+          totalCars: stats.totalCars,
+          lastUpdated: stats.lastUpdated,
+        },
+      };
+    } catch (error) {
+      this.logger.error(`Admin refresh failed: ${(error as Error).message}`);
+      return { success: false, message: 'Refresh failed.' };
     }
   }
 }
