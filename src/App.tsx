@@ -143,7 +143,7 @@ function App() {
               {lang === 'en' ? 'Our Advantages' : lang === 'ru' ? 'Наши Преимущества' : 'Биздин Артыкчылыктар'}
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              {lang === 'en' ? 'Why Kyrgyzstan Chooses Us' : lang === 'ru' ? 'Почему Кыргызстан выбирает нас' : 'Эмне үчүн Кыргызстан бизди тандайт'}
+              {lang === 'en' ? 'Why Clients Choose Us' : lang === 'ru' ? 'Почему клиенты выбирают нас' : 'Эмне үчүн кардарлар бизди тандайт'}
             </h2>
             <div className="w-16 h-1 bg-kg-gold mx-auto mt-4 rounded-full" />
           </div>
@@ -174,10 +174,10 @@ function App() {
               </h3>
               <p className="text-slate-400 text-xs sm:text-sm leading-relaxed font-medium">
                 {lang === 'en'
-                  ? 'Full escorting of shipping from South Korea to Bishkek.'
+                  ? 'Full escorting of shipping from South Korea to your destination.'
                   : lang === 'ru'
-                  ? 'Полное сопровождение доставки из Южной Кореи до Бишкека.'
-                  : 'Түштүк Кореядан Бишкекке чейин жеткирүүнү толук коштоо.'}
+                  ? 'Полное сопровождение доставки из Южной Кореи до вашей страны.'
+                  : 'Түштүк Кореядан сиздин өлкөгө чейин жеткирүүнү толук коштоо.'}
               </p>
             </div>
 
@@ -207,7 +207,7 @@ function App() {
             <div className="absolute inset-0 bg-gradient-to-tr from-brand-700/10 to-transparent rounded-3xl" />
             <img
               src="https://images.unsplash.com/photo-1560179707-f14e90ef3623?q=80&w=600&auto=format&fit=crop"
-              alt="KG Motors Team Showroom"
+              alt="MK Auto Team Showroom"
               className="w-full rounded-3xl shadow-xl border border-slate-100 object-cover aspect-[4/3]"
             />
             <div className="absolute -bottom-6 -right-6 bg-brand-950 text-white p-5 rounded-2xl shadow-2xl border border-white/5 flex items-center gap-3">
@@ -223,14 +223,14 @@ function App() {
               {lang === 'en' ? 'Who We Are' : lang === 'ru' ? 'О Нашей Компании' : 'Биздин Компания Жөнүндө'}
             </span>
             <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">
-              {lang === 'en' ? 'KG Motors Korea — Sourcing the Best Korean Vehicles for Kyrgyzstan' : lang === 'ru' ? 'KG Motors Korea — Лучшие автомобили из Кореи для Кыргызстана' : 'KG Motors Korea — Кыргызстан үчүн Кореядан эң мыкты унаалар'}
+              {lang === 'en' ? 'MK Auto Korea — Sourcing the Best Korean Vehicles for Export' : lang === 'ru' ? 'MK Auto Korea — Лучшие автомобили из Кореи для экспорта' : 'MK Auto Korea — Кореядан экспорттоо үчүн эң мыкты унаалар'}
             </h2>
             <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
               {lang === 'en'
-                ? 'KG Motors Korea is a leading export broker operating directly between Seoul and Bishkek.'
+                ? 'MK Auto Korea is a leading export broker operating directly from Seoul, South Korea.'
                 : lang === 'ru'
-                ? 'KG Motors Korea — ведущий экспортный брокер, работающий напрямую между Сеулом и Бишкеком. Мы специализируемся на импорте корейских седанов, внедорожников и коммерческой техники.'
-                : 'KG Motors Korea — Сеул жана Бишкек шаарларынын ортосунда түз иштеген алдыңкы экспорттук брокер.'}
+                ? 'MK Auto Korea — ведущий экспортный брокер, работающий напрямую из Сеула, Южная Корея. Мы специализируемся на экспорте корейских седанов, внедорожников и коммерческой техники в СНГ и другие регионы.'
+                : 'MK Auto Korea — Түштүк Кореядан сапаттуу унааларды экспорттоо боюнча ишенимдүү өнөктөшүңүз.'}
             </p>
             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
               <div>
@@ -238,7 +238,7 @@ function App() {
                 <p className="text-xs text-slate-500">Full export licensing, purchasing, vehicle scanning and logistics.</p>
               </div>
               <div>
-                <h4 className="text-sm font-black text-slate-900 mb-1">Bishkek Office</h4>
+                <h4 className="text-sm font-black text-slate-900 mb-1">Regional Office</h4>
                 <p className="text-xs text-slate-500">Customs clearance support, sales support, client consultations.</p>
               </div>
             </div>
