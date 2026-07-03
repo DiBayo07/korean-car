@@ -77,7 +77,9 @@ function App() {
 
   // --- CONDITIONAL RETURNS ---
 
-  if (loading) {
+  const isInitialLoading = loading && encarVehicles.length === 0;
+
+  if (isInitialLoading) {
     return (
       <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-400 gap-3">
         <div className="w-10 h-10 rounded-full border-4 border-t-kg-gold border-slate-800 animate-spin" />
@@ -86,14 +88,12 @@ function App() {
     );
   }
 
-
-
   // Home page content
   const HomePage = () => (
     <main className="flex-grow">
       {/* Hero Section */}
       <Hero
-        key={searchCriteria ? 'filtered' : 'initial'}
+        key={searchCriteria ? 'active' : 'reset'}
         t={t}
         lang={lang}
         onSearch={handleSearch}

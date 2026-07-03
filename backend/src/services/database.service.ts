@@ -112,12 +112,68 @@ export class DatabaseService {
     return this.encarCarRepository.count();
   }
 
+  generateDealerDescription(car: EncarCar): string {
+    const parts: string[] = [];
+    
+    const brandModel = car.brand && car.model ? `${car.brand} ${car.model}` : 'Автомобиль';
+    const yearStr = car.year ? `${car.year} года выпуска` : '';
+    const mileageStr = car.mileage ? `пробег ${car.mileage.toLocaleString()} км` : '';
+    const fuelStr = car.fuel ? `топливо: ${car.fuel}` : '';
+    const transStr = car.transmission ? `КПП: ${car.transmission}` : '';
+    const bodyStr = car.body_type ? `кузов: ${car.body_type}` : '';
+    const colorStr = car.color ? `цвет: ${car.color}` : '';
+    const dispStr = car.displacement ? `объем двигателя: ${car.displacement}cc` : '';
+
+    const mainDetails = [fuelStr, transStr, bodyStr, colorStr, dispStr].filter(Boolean).join(', ');
+    
+    let mainSentence = `Автомобиль ${brandModel}`;
+    if (yearStr) mainSentence += ` ${yearStr}`;
+    if (mileageStr) mainSentence += `, ${mileageStr}`;
+    if (mainDetails) mainSentence += `, ${mainDetails}`;
+    mainSentence += '.';
+    parts.push(mainSentence);
+
+    if (car.has_accidents === true) {
+      parts.push('В наличии ДТП.');
+    } else if (car.has_accidents === false) {
+      parts.push('Без ДТП.');
+    }
+
+    if (car.owner_changes_count !== null && car.owner_changes_count !== undefined) {
+      parts.push(`Количество владельцев: ${car.owner_changes_count}.`);
+    }
+
+    if (car.repairs_total_cost !== null && car.repairs_total_cost !== undefined) {
+      parts.push(`Стоимость ремонтов: ${car.repairs_total_cost.toLocaleString()} KRW.`);
+    }
+
+    if (car.has_repairs === true) {
+      parts.push('Был ремонт.');
+    }
+
+    if (car.has_painting === true) {
+      parts.push('Была покраска.');
+    }
+
+    if (car.has_waterlog === true) {
+      parts.push('Был контакт с водой.');
+    }
+
+    parts.push('Полная диагностика доступна.');
+
+    return parts.join(' ');
+  }
+
   /**
    * Gets a single car by its id from encar_cars table. Returns null if not found.
    */
   async getCarById(id: string): Promise<EncarCar | null> {
     try {
-      return await this.encarCarRepository.findOneBy({ id });
+      const car = await this.encarCarRepository.findOneBy({ id });
+      if (car && (!car.description || car.description.trim() === '')) {
+        car.description = this.generateDealerDescription(car);
+      }
+      return car;
     } catch (error) {
       this.logger.error(`Failed to get car ${id}: ${(error as Error).message}`);
       throw error;
@@ -294,6 +350,11 @@ export class DatabaseService {
         take: Math.min(limit, 100),
         skip: offset,
       });
+      for (const car of items) {
+        if (!car.description || car.description.trim() === '') {
+          car.description = this.generateDealerDescription(car);
+        }
+      }
       return { items, total };
     } catch (error) {
       this.logger.error(`Failed to query encar_cars: ${(error as Error).message}`);

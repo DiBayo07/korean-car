@@ -33,7 +33,7 @@ export const CarDetailsPage = ({ t: _t, lang: _lang }: CarDetailsPageProps) => {
 
   const handleWhatsApp = () => {
     const usdPrice = car.price_usd || Math.round((car.price || 0) / 1350);
-    const text = `Здравствуйте, меня интересует этот автомобиль: ${car.brand} ${car.model}\nЦена: $${usdPrice.toLocaleString()}\nСсылка: ${window.location.href}`;
+    const text = `Hello, I am interested in this vehicle: ${car.brand} ${car.model}\nPrice: $${usdPrice.toLocaleString()}\nLink: ${window.location.href}`;
     window.open(`https://wa.me/821065914114?text=${encodeURIComponent(text)}`, '_blank');
   };
 
