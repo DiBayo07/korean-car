@@ -51,6 +51,11 @@ export const Header: React.FC<HeaderProps> = ({
     { code: 'en', label: 'English' },
     { code: 'ru', label: 'Русский' },
     { code: 'ky', label: 'Кыргызча' },
+    { code: 'ko', label: '한국어' },
+    { code: 'mn', label: 'Монгол' },
+    { code: 'ro', label: 'Română' },
+    { code: 'de', label: 'Deutsch' },
+    { code: 'sq', label: 'Shqip' },
   ];
 
   const handleScrollToSection = (sectionId: string) => {
