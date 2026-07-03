@@ -390,3 +390,9 @@ export const translations: Record<Language, TranslationDict> = {
     priceConverted: 'afërsisht',
   }
 };
+
+export function getLangText(lang: string, enVal: string, ruVal: string, kyVal: string): string {
+  if (lang === 'ru') return ruVal;
+  if (lang === 'ky') return kyVal;
+  return enVal;
+}

@@ -11,7 +11,7 @@ import { CarDetailsPage } from './pages/CarDetailsPage';
 import { useVehicles } from './hooks/useVehicles';
 import type { UseVehiclesFilters } from './hooks/useVehicles';
 import type { Vehicle } from './lib/api';
-import { translations } from './lib/translations';
+import { translations, getLangText } from './lib/translations';
 import type { Language } from './lib/translations';
 import { CheckCircle2, ShieldCheck, ClipboardCheck, Sparkles, X } from 'lucide-react';
 
@@ -115,7 +115,7 @@ function App() {
           <div className="flex items-center gap-2">
             <Sparkles className="text-kg-gold shrink-0" size={18} />
             <span className="text-xs font-semibold">
-              {lang === 'en' ? 'Showing search results for' : lang === 'ru' ? 'Результаты поиска для' : 'Издөө жыйынтыктары'} :{' '}
+              {getLangText(lang, 'Showing search results for', 'Результаты поиска для', 'Издөө жыйынтыктары')} :{' '}
               <strong className="text-brand-600">
                 {searchCriteria.brand || ''} {searchCriteria.model || ''}
               </strong>{' '}
@@ -142,10 +142,10 @@ function App() {
         <div className="max-w-7xl mx-auto">
           <div className="text-center max-w-2xl mx-auto mb-16">
             <span className="text-xs font-extrabold text-kg-gold uppercase tracking-widest block mb-2">
-              {lang === 'en' ? 'Our Advantages' : lang === 'ru' ? 'Наши Преимущества' : 'Биздин Артыкчылыктар'}
+              {getLangText(lang, 'Our Advantages', 'Наши Преимущества', 'Биздин Артыкчылыктар')}
             </span>
             <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight">
-              {lang === 'en' ? 'Why Clients Choose Us' : lang === 'ru' ? 'Почему клиенты выбирают нас' : 'Эмне үчүн кардарлар бизди тандайт'}
+              {getLangText(lang, 'Why Clients Choose Us', 'Почему клиенты выбирают нас', 'Эмне үчүн кардарлар бизди тандайт')}
             </h2>
             <div className="w-16 h-1 bg-kg-gold mx-auto mt-4 rounded-full" />
           </div>
@@ -156,14 +156,14 @@ function App() {
                 <ShieldCheck size={28} />
               </div>
               <h3 className="text-lg font-extrabold mb-3">
-                {lang === 'en' ? '100% Verified Cars' : lang === 'ru' ? '100% Проверенные Авто' : '100% Текшерилген Унаалар'}
+                {getLangText(lang, '100% Verified Cars', '100% Проверенные Авто', '100% Текшерилген Унаалар')}
               </h3>
               <p className="text-slate-400 text-xs sm:text-sm leading-relaxed font-medium">
-                {lang === 'en' 
-                  ? 'Our certified specialists in Korea conduct detailed technical diagnostics of each vehicle.' 
-                  : lang === 'ru' 
-                  ? 'Наши сертифицированные специалисты в Корее проводят детальную техническую диагностику каждого автомобиля.'
-                  : 'Кореядагы биздин тастыкталган адистер ар бир унааны деталдуу техникалык диагностикадан өткөрүшөт.'}
+                {getLangText(lang,
+                  'Our certified specialists in Korea conduct detailed technical diagnostics of each vehicle.',
+                  'Наши сертифицированные специалисты в Корее проводят детальную техническую диагностику каждого автомобиля.',
+                  'Кореядагы биздин тастыкталган адистер ар бир унааны деталдуу техникалык диагностикадан өткөрүшөт.'
+                )}
               </p>
             </div>
 
@@ -172,14 +172,14 @@ function App() {
                 <CheckCircle2 size={28} />
               </div>
               <h3 className="text-lg font-extrabold mb-3">
-                {lang === 'en' ? 'Customs & Logistics Support' : lang === 'ru' ? 'Логистика и Растаможка' : 'Логистика жана Бажы'}
+                {getLangText(lang, 'Customs & Logistics Support', 'Логистика и Растаможка', 'Логистика жана Бажы')}
               </h3>
               <p className="text-slate-400 text-xs sm:text-sm leading-relaxed font-medium">
-                {lang === 'en'
-                  ? 'Full escorting of shipping from South Korea to your destination.'
-                  : lang === 'ru'
-                  ? 'Полное сопровождение доставки из Южной Кореи до вашей страны.'
-                  : 'Түштүк Кореядан сиздин өлкөгө чейин жеткирүүнү толук коштоо.'}
+                {getLangText(lang,
+                  'Full escorting of shipping from South Korea to your destination.',
+                  'Полное сопровождение доставки из Южной Кореи до вашей страны.',
+                  'Түштүк Кореядан сиздин өлкөгө чейин жеткирүүнү толук коштоо.'
+                )}
               </p>
             </div>
 
@@ -188,14 +188,14 @@ function App() {
                 <ClipboardCheck size={28} />
               </div>
               <h3 className="text-lg font-extrabold mb-3">
-                {lang === 'en' ? 'Direct Auction Access' : lang === 'ru' ? 'Прямой Доступ к Аукционам' : 'Аукциондорго түз кирүү'}
+                {getLangText(lang, 'Direct Auction Access', 'Прямой Доступ к Аукционам', 'Аукциондорго түз кирүү')}
               </h3>
               <p className="text-slate-400 text-xs sm:text-sm leading-relaxed font-medium">
-                {lang === 'en'
-                  ? 'Buy cars directly from major Korean platforms like Encar, K-Car, Lotte.'
-                  : lang === 'ru'
-                  ? 'Покупайте автомобили напрямую с крупнейших корейских платформ: Encar, K-Car, Lotte и Glovis.'
-                  : 'Кореянын эң ири платформаларынан унааларды түз сатып алыңыз: Encar, K-Car, Lotte жана Glovis.'}
+                {getLangText(lang,
+                  'Buy cars directly from major Korean platforms like Encar, K-Car, Lotte.',
+                  'Покупайте автомобили напрямую с крупнейших корейских платформ: Encar, K-Car, Lotte и Glovis.',
+                  'Кореянын эң ири платформаларынан унааларды түз сатып алыңыз: Encar, K-Car, Lotte жана Glovis.'
+                )}
               </p>
             </div>
           </div>
@@ -222,17 +222,17 @@ function App() {
 
           <div className="lg:col-span-7 space-y-6 lg:pl-6">
             <span className="text-xs font-extrabold text-brand-500 uppercase tracking-widest block">
-              {lang === 'en' ? 'Who We Are' : lang === 'ru' ? 'О Нашей Компании' : 'Биздин Компания Жөнүндө'}
+              {getLangText(lang, 'Who We Are', 'О Нашей Компании', 'Биздин Компания Жөнүндө')}
             </span>
             <h2 className="text-3xl font-extrabold tracking-tight text-slate-900">
-              {lang === 'en' ? 'MK Auto Korea — Sourcing the Best Korean Vehicles for Export' : lang === 'ru' ? 'MK Auto Korea — Лучшие автомобили из Кореи для экспорта' : 'MK Auto Korea — Кореядан экспорттоо үчүн эң мыкты унаалар'}
+              {getLangText(lang, 'MK Auto Korea — Sourcing the Best Korean Vehicles for Export', 'MK Auto Korea — Лучшие автомобили из Кореи для экспорта', 'MK Auto Korea — Кореядан экспорттоо үчүн эң мыкты унаалар')}
             </h2>
             <p className="text-slate-500 text-sm sm:text-base leading-relaxed">
-              {lang === 'en'
-                ? 'MK Auto Korea is a leading export broker operating directly from Seoul, South Korea.'
-                : lang === 'ru'
-                ? 'MK Auto Korea — ведущий экспортный брокер, работающий напрямую из Сеула, Южная Корея. Мы специализируемся на экспорте корейских седанов, внедорожников и коммерческой техники в СНГ и другие регионы.'
-                : 'MK Auto Korea — Түштүк Кореядан сапаттуу унааларды экспорттоо боюнча ишенимдүү өнөктөшүңүз.'}
+              {getLangText(lang,
+                'MK Auto Korea is a leading export broker operating directly from Seoul, South Korea.',
+                'MK Auto Korea — ведущий экспортный брокер, работающий напрямую из Сеула, Южная Корея. Мы специализируемся на экспорте корейских седанов, внедорожников и коммерческой техники.',
+                'MK Auto Korea — Түштүк Кореядан сапаттуу унааларды экспорттоо боюнча ишенимдүү өнөктөшүңүз.'
+              )}
             </p>
             <div className="grid grid-cols-2 gap-4 pt-4 border-t border-slate-100">
               <div>

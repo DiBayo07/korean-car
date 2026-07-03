@@ -5,6 +5,7 @@ import { translateBrandName, getFullImageUrl } from '../api/encarApi';
 import type { CarapisManufacturer, CarapisModelGroup, CarapisModel } from '../api/encarApi';
 import type { EncarVehicle } from '../api/encarApi';
 import type { Language, TranslationDict } from '../lib/translations';
+import { getLangText } from '../lib/translations';
 
 interface CarsPageProps {
   vehicles: EncarVehicle[];
@@ -66,13 +67,13 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, 
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-transparent to-slate-950" />
         <div className="relative z-10 text-center px-4">
           <span className="text-xs font-extrabold text-kg-gold uppercase tracking-[0.2em] block mb-3">
-            {lang === 'en' ? 'Vehicle Catalog' : lang === 'ru' ? 'Каталог транспорта' : 'Унаалар каталогу'}
+            {getLangText(lang, 'Vehicle Catalog', 'Каталог транспорта', 'Унаалар каталогу')}
           </span>
           <h1 className="text-4xl sm:text-5xl font-extrabold tracking-tight mb-4">
-            {lang === 'en' ? 'Cars from Korea' : lang === 'ru' ? 'Автомобили из Кореи' : 'Кореядан унаалар'}
+            {getLangText(lang, 'Cars from Korea', 'Автомобили из Кореи', 'Кореядан унаалар')}
           </h1>
           <p className="text-slate-400 text-sm sm:text-base max-w-lg mx-auto">
-            {lang === 'en' ? 'Browse our selection of verified Korean vehicles' : lang === 'ru' ? 'Проверенные автомобили напрямую из Южной Кореи' : 'Түштүк Кореядан түз текшерилген унаалар'}
+            {getLangText(lang, 'Browse our selection of verified Korean vehicles', 'Проверенные автомобили напрямую из Южной Кореи', 'Түштүк Кореядан түз текшерилген унаалар')}
           </p>
         </div>
       </section>
@@ -148,7 +149,7 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, 
                   ? 'bg-kg-gold/20 text-kg-gold border-kg-gold/30'
                   : 'border-white/10 text-slate-300 hover:bg-white/5'
               }`}
-              title={lang === 'en' ? 'Advanced filters' : lang === 'ru' ? 'Расширенные фильтры' : 'Кеңейтилген чыпкалар'}
+              title={getLangText(lang, 'Advanced filters', 'Расширенные фильтры', 'Кеңейтилген чыпкалар')}
             >
               <SlidersHorizontal size={16} />
             </button>
@@ -157,11 +158,11 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, 
                 onClick={clearFilters}
                 className="px-4 py-2.5 rounded-xl border border-white/10 text-xs font-bold text-slate-300 hover:bg-white/5 transition-all"
               >
-                ✕ {lang === 'en' ? 'Clear' : lang === 'ru' ? 'Сбросить' : 'Тазалоо'}
+                ✕ {getLangText(lang, 'Clear', 'Сбросить', 'Тазалоо')}
               </button>
             )}
             <span className="text-xs text-slate-500 font-semibold whitespace-nowrap">
-              {loading ? '...' : vehicles.length} {lang === 'en' ? 'cars' : lang === 'ru' ? 'авто' : 'унаа'}
+              {loading ? '...' : vehicles.length} {getLangText(lang, 'cars', 'авто', 'унаа')}
             </span>
           </div>
         </div>
@@ -174,64 +175,64 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, 
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
               {/* Search text */}
               <div className="flex flex-col bg-[#121824] rounded-xl px-3 py-2 border border-white/5">
-                <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">{lang === 'en' ? 'SEARCH' : lang === 'ru' ? 'ПОИСК' : 'ИЗДӨӨ'}</span>
+                <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">{getLangText(lang, 'SEARCH', 'ПОИСК', 'ИЗДӨӨ')}</span>
                 <input
                   type="text"
                   value={searchText}
                   onChange={(e) => setSearchText(e.target.value)}
-                  placeholder={lang === 'en' ? 'Brand or model...' : lang === 'ru' ? 'Марка или модель...' : 'Марка же модел...'}
+                  placeholder={getLangText(lang, 'Brand or model...', 'Марка или модель...', 'Марка же модел...')}
                   className="bg-transparent text-white text-sm font-semibold focus:outline-none placeholder:text-slate-600"
                 />
               </div>
 
               {/* Year from */}
               <div className="flex flex-col bg-[#121824] rounded-xl px-3 py-2 border border-white/5">
-                <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">{lang === 'en' ? 'YEAR FROM' : lang === 'ru' ? 'ГОД ОТ' : 'ЖЫЛДАН'}</span>
+                <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">{getLangText(lang, 'YEAR FROM', 'ГОД ОТ', 'ЖЫЛДАН')}</span>
                 <input
                   type="number"
                   value={yearFrom}
                   onChange={(e) => setYearFrom(e.target.value)}
                   min="2000" max="2026"
-                  placeholder={lang === 'en' ? 'e.g. 2020' : 'e.g. 2020'}
+                  placeholder="e.g. 2020"
                   className="bg-transparent text-white text-sm font-semibold focus:outline-none placeholder:text-slate-600"
                 />
               </div>
 
               {/* Year to */}
               <div className="flex flex-col bg-[#121824] rounded-xl px-3 py-2 border border-white/5">
-                <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">{lang === 'en' ? 'YEAR TO' : lang === 'ru' ? 'ГОД ДО' : 'ЖЫЛГА ЧЕЙИН'}</span>
+                <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">{getLangText(lang, 'YEAR TO', 'ГОД ДО', 'ЖЫЛГА ЧЕЙИН')}</span>
                 <input
                   type="number"
                   value={yearTo}
                   onChange={(e) => setYearTo(e.target.value)}
                   min="2000" max="2026"
-                  placeholder={lang === 'en' ? 'e.g. 2025' : 'e.g. 2025'}
+                  placeholder="e.g. 2025"
                   className="bg-transparent text-white text-sm font-semibold focus:outline-none placeholder:text-slate-600"
                 />
               </div>
 
               {/* Price from */}
               <div className="flex flex-col bg-[#121824] rounded-xl px-3 py-2 border border-white/5">
-                <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">{lang === 'en' ? 'PRICE FROM, $' : lang === 'ru' ? 'ЦЕНА ОТ, $' : 'БААДАН, $'}</span>
+                <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">{getLangText(lang, 'PRICE FROM, $', 'ЦЕНА ОТ, $', 'БААДАН, $')}</span>
                 <input
                   type="number"
                   value={priceFrom}
                   onChange={(e) => setPriceFrom(e.target.value)}
                   min="0"
-                  placeholder={lang === 'en' ? 'e.g. 5000' : 'e.g. 5000'}
+                  placeholder="e.g. 5000"
                   className="bg-transparent text-white text-sm font-semibold focus:outline-none placeholder:text-slate-600"
                 />
               </div>
 
               {/* Price to */}
               <div className="flex flex-col bg-[#121824] rounded-xl px-3 py-2 border border-white/5">
-                <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">{lang === 'en' ? 'PRICE TO, $' : lang === 'ru' ? 'ЦЕНА ДО, $' : 'БААГА ЧЕЙИН, $'}</span>
+                <span className="text-[9px] font-extrabold text-slate-500 uppercase tracking-wider mb-1">{getLangText(lang, 'PRICE TO, $', 'ЦЕНА ДО, $', 'БААГА ЧЕЙИН, $')}</span>
                 <input
                   type="number"
                   value={priceTo}
                   onChange={(e) => setPriceTo(e.target.value)}
                   min="0"
-                  placeholder={lang === 'en' ? 'e.g. 30000' : 'e.g. 30000'}
+                  placeholder="e.g. 30000"
                   className="bg-transparent text-white text-sm font-semibold focus:outline-none placeholder:text-slate-600"
                 />
               </div>
@@ -257,7 +258,7 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, 
                 }}
                 className="px-6 py-2 bg-kg-gold hover:bg-yellow-500 text-brand-950 font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all active:scale-95 shadow-lg"
               >
-                {lang === 'en' ? 'Apply Filters' : lang === 'ru' ? 'Применить' : 'Колдонуу'}
+                {getLangText(lang, 'Apply Filters', 'Применить', 'Колдонуу')}
               </button>
               {(searchText || yearFrom || yearTo || priceFrom || priceTo) && (
                 <button
@@ -274,7 +275,7 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, 
                   }}
                   className="px-4 py-2 rounded-xl border border-white/10 text-xs font-bold text-slate-300 hover:bg-white/5 transition-all"
                 >
-                  {lang === 'en' ? 'Reset' : lang === 'ru' ? 'Сбросить всё' : 'Баарын тазалоо'}
+                  {getLangText(lang, 'Reset', 'Сбросить всё', 'Баарын тазалоо')}
                 </button>
               )}
             </div>
@@ -287,16 +288,16 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, 
         {loading && vehicles.length === 0 ? (
           <div className="py-24 text-center flex flex-col items-center justify-center gap-3">
             <div className="w-8 h-8 rounded-full border-2 border-t-kg-gold border-slate-800 animate-spin" />
-            <p className="text-slate-500 text-xs font-semibold">Загрузка...</p>
+            <p className="text-slate-500 text-xs font-semibold">{getLangText(lang, 'Loading...', 'Загрузка...', 'Жүктөлүүдө...')}</p>
           </div>
         ) : vehicles.length === 0 ? (
           <div className="py-24 text-center">
             <Search size={48} className="mx-auto text-slate-700 mb-4" />
             <p className="text-slate-500 text-sm font-semibold">
-              {lang === 'en' ? 'No cars found matching your criteria' : lang === 'ru' ? 'Автомобили не найдены' : 'Унаалар табылган жок'}
+              {getLangText(lang, 'No cars found matching your criteria', 'Автомобили не найдены', 'Унаалар табылган жок')}
             </p>
             <button onClick={clearFilters} className="mt-4 px-6 py-2 bg-brand-500 text-white text-xs font-bold rounded-lg hover:bg-brand-600 transition-all">
-              {lang === 'en' ? 'Clear filters' : lang === 'ru' ? 'Сбросить фильтры' : 'Чыпкаларды тазалоо'}
+              {getLangText(lang, 'Clear filters', 'Сбросить фильтры', 'Чыпкаларды тазалоо')}
             </button>
           </div>
         ) : (
@@ -372,7 +373,7 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, 
                   disabled={loading}
                   className="px-8 py-3 bg-brand-500 hover:bg-brand-600 disabled:opacity-40 text-white text-xs font-bold uppercase tracking-wider rounded-xl shadow-lg hover:shadow-brand-500/20 transition-all"
                 >
-                  {loading ? 'Загрузка...' : (lang === 'en' ? 'Load More' : lang === 'ru' ? 'Загрузить ещё' : 'Дагы жүктөө')}
+                  {loading ? getLangText(lang, 'Loading...', 'Загрузка...', 'Жүктөлүүдө...') : getLangText(lang, 'Load More', 'Загрузить ещё', 'Дагы жүктөө')}
                 </button>
               </div>
             )}

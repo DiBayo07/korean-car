@@ -239,15 +239,20 @@ export async function listVehicles(params: ListVehiclesParams = {}): Promise<Lis
   const res = await fetch(`${API_URL}/search?${searchParams.toString()}`);
   if (!res.ok) throw new Error(`Search failed: ${res.status}`);
 
-  const data: SearchResponse = await res.json();
-  if (!data.success) throw new Error(data.message || 'Search failed');
+  const data: any = await res.json();
+  const isSuccessful = data.success === true || (data.success === undefined && Array.isArray(data.items));
+  if (!isSuccessful) throw new Error(data.message || 'Search failed');
+
+  const items = Array.isArray(data.items) ? data.items : [];
+  const limitVal = data.limit || params.limit || 50;
+  const totalVal = data.total !== undefined ? data.total : items.length;
 
   return {
-    count: data.total,
-    page: data.page,
-    pages: Math.ceil(data.total / data.limit),
-    limit: data.limit,
-    results: data.items.map(mapSearchItem),
+    count: totalVal,
+    page: data.page || 1,
+    pages: Math.ceil(totalVal / limitVal) || 1,
+    limit: limitVal,
+    results: items.map(mapSearchItem),
   };
 }
 
@@ -256,10 +261,9 @@ export async function getVehicleDetail(id: string | number): Promise<EncarDetail
     const res = await fetch(`${API_URL}/item/${id}?type=car`);
     if (!res.ok) return null;
 
-    const data: DetailResponse = await res.json();
-    if (!data.success || !data.data) return null;
-
-    const d = data.data;
+    const data: any = await res.json();
+    const d = (data.success === true && data.data) ? data.data : (data.id && data.title ? data : null);
+    if (!d) return null;
     return {
       id: d.id,
       title: d.title,

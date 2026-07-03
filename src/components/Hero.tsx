@@ -3,6 +3,7 @@ import { Search, SlidersHorizontal, X } from 'lucide-react';
 import { translateBrandName } from '../api/encarApi';
 import type { CarapisManufacturer, CarapisModelGroup, CarapisModel } from '../api/encarApi';
 import type { TranslationDict } from '../lib/translations';
+import { getLangText } from '../lib/translations';
 import type { UseVehiclesFilters } from '../hooks/useVehicles';
 
 interface HeroProps {
@@ -196,7 +197,7 @@ export const Hero: React.FC<HeroProps> = ({
                 ? 'bg-brand-500 text-white border-brand-500 shadow-lg shadow-brand-500/20'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border-slate-200'
             }`}
-            title={lang === 'ru' ? 'Фильтры' : lang === 'en' ? 'Filters' : 'Чыпкалар'}
+            title={getLangText(lang, 'Filters', 'Фильтры', 'Чыпкалар')}
           >
             <SlidersHorizontal size={18} className={showFilters || hasActiveFilters ? '' : 'group-hover:scale-110 transition-transform'} />
           </button>
@@ -207,7 +208,7 @@ export const Hero: React.FC<HeroProps> = ({
             className="sm:w-auto px-8 py-4 bg-slate-950 hover:bg-black active:scale-95 text-white font-bold rounded-2xl flex items-center justify-center gap-2 shadow-xl hover:shadow-kg-gold/20 transition-all duration-300 border border-slate-800 group"
           >
             <Search size={18} className="text-kg-gold group-hover:scale-110 transition-transform" />
-            {t.searchBtn || (lang === 'ru' ? 'Найти' : lang === 'en' ? 'Search' : 'Издөө')}
+            {t.searchBtn || getLangText(lang, 'Search', 'Найти', 'Издөө')}
           </button>
         </div>
 
@@ -217,34 +218,34 @@ export const Hero: React.FC<HeroProps> = ({
             <div className="flex flex-col sm:flex-row gap-4 items-stretch sm:items-end">
               <div className="flex-1 flex flex-col">
                 <span className="text-[10px] font-extrabold text-kg-gold tracking-wider mb-1.5 uppercase">
-                  {lang === 'ru' ? 'ПРОИЗВОДИТЕЛЬ' : lang === 'en' ? 'MANUFACTURER' : 'ӨНДҮРҮҮЧҮ'}
+                  {getLangText(lang, 'MANUFACTURER', 'ПРОИЗВОДИТЕЛЬ', 'ӨНДҮРҮҮЧҮ')}
                 </span>
                 <input
                   type="text"
                   value={localBrand}
                   onChange={(e) => setLocalBrand(e.target.value)}
-                  placeholder={lang === 'ru' ? 'Напр. hyundai, kia' : 'e.g. hyundai, kia'}
+                  placeholder={getLangText(lang, 'e.g. hyundai, kia', 'Напр. hyundai, kia', 'Напр. hyundai, kia')}
                   className="w-full bg-white/10 border border-white/10 text-white text-sm font-semibold rounded-xl px-4 py-2.5 focus:outline-none focus:border-kg-gold/50 focus:bg-white/15 transition-all placeholder:text-white/30"
                 />
               </div>
 
               <div className="flex-1 flex flex-col">
                 <span className="text-[10px] font-extrabold text-kg-gold tracking-wider mb-1.5 uppercase">
-                  {lang === 'ru' ? 'ГОД ОТ' : lang === 'en' ? 'YEAR FROM' : 'ЖЫЛДАН'}
+                  {getLangText(lang, 'YEAR FROM', 'ГОД ОТ', 'ЖЫЛДАН')}
                 </span>
                 <input
                   type="number"
                   value={localYear}
                   onChange={(e) => setLocalYear(e.target.value)}
                   min="2000" max="2026"
-                  placeholder={lang === 'ru' ? 'Напр. 2022' : 'e.g. 2022'}
+                  placeholder={getLangText(lang, 'e.g. 2022', 'Напр. 2022', 'Напр. 2022')}
                   className="w-full bg-white/10 border border-white/10 text-white text-sm font-semibold rounded-xl px-4 py-2.5 focus:outline-none focus:border-kg-gold/50 focus:bg-white/15 transition-all placeholder:text-white/30"
                 />
               </div>
 
               <div className="flex gap-2 shrink-0">
                 <button onClick={applyFilters} className="px-6 py-2.5 bg-kg-gold hover:bg-yellow-500 text-brand-950 font-extrabold text-xs uppercase tracking-wider rounded-xl transition-all active:scale-95 shadow-lg">
-                  {lang === 'ru' ? 'Применить' : lang === 'en' ? 'Apply' : 'Колдонуу'}
+                  {getLangText(lang, 'Apply', 'Применить', 'Колдонуу')}
                 </button>
                 {hasActiveFilters && (
                   <button onClick={clearFilters} className="px-3 py-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all border border-white/10">
