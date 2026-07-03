@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, Between, In, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
+import { Repository, Like, ILike, Between, In, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { Car } from '../entities/car.entity';
 import { EncarCar } from '../entities/encar-car.entity';
 
@@ -310,6 +310,7 @@ export class DatabaseService {
    * This is the primary search method for webhook data.
    */
   async getCars(filters: CarFilters = {}): Promise<{ items: EncarCar[]; total: number }> {
+    this.logger.log(`getCars called with filters: ${JSON.stringify(filters)}`);
     const {
       brand, model, yearFrom, yearTo, priceFrom, priceTo, fuel, transmission,
       limit = 20, offset = 0,
@@ -318,14 +319,14 @@ export class DatabaseService {
     const where: Record<string, unknown> = {};
     if (brand) {
       const cleanBrand = brand.replace(/-/g, '%');
-      where.brand = Like(`%${cleanBrand}%`);
+      where.brand = ILike(`%${cleanBrand}%`);
     }
     if (model) {
       const cleanModel = model.replace(/-/g, '%');
-      where.model = Like(`%${cleanModel}%`);
+      where.model = ILike(`%${cleanModel}%`);
     }
-    if (fuel) where.fuel = Like(`%${fuel}%`);
-    if (transmission) where.transmission = Like(`%${transmission}%`);
+    if (fuel) where.fuel = ILike(`%${fuel}%`);
+    if (transmission) where.transmission = ILike(`%${transmission}%`);
 
     if (yearFrom !== undefined && yearTo !== undefined) {
       where.year = Between(yearFrom, yearTo);
@@ -350,6 +351,7 @@ export class DatabaseService {
         take: Math.min(limit, 100),
         skip: offset,
       });
+      this.logger.log(`getCars query successful: found ${total} cars, returning ${items.length} items`);
       for (const car of items) {
         if (!car.description || car.description.trim() === '') {
           car.description = this.generateDealerDescription(car);
