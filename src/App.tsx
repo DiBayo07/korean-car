@@ -89,7 +89,7 @@ function App() {
   }
 
   // Home page content
-  const HomePage = () => (
+  const homePageElement = (
     <main className="flex-grow">
       {/* Hero Section */}
       <Hero
@@ -264,7 +264,7 @@ function App() {
       />
 
       <Routes>
-        <Route path="/korean-car/" element={<HomePage />} />
+        <Route path="/korean-car/" element={homePageElement} />
         <Route path="/korean-car/cars" element={
           <CarsPage
             vehicles={encarVehicles}
@@ -286,7 +286,7 @@ function App() {
         } />
         <Route path="/korean-car/car/:id" element={<CarDetailsPage t={t} lang={lang} />} />
         {/* Fallback to home */}
-        <Route path="*" element={<HomePage />} />
+        <Route path="*" element={homePageElement} />
       </Routes>
 
       <Footer
