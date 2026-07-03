@@ -66,7 +66,7 @@ export interface ItemDetail {
   engineCc?: number;
 }
 
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:3000/api';
+const API_URL = import.meta.env.VITE_API_URL || 'https://korean-car-backend.onrender.com/api';
 const KRW_TO_USD = 1350;
 
 function mapSearchItemToVehicle(item: SearchItem, vehicleType: 'car' | 'bike'): Vehicle {

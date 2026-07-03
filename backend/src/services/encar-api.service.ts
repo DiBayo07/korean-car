@@ -140,11 +140,15 @@ export class ItemService {
       if (car.body_type) specs['Body Type'] = car.body_type;
       if (car.color) specs['Color'] = car.color;
       if (car.displacement) specs['Displacement'] = `${car.displacement}cc`;
+      if (car.accident_count !== null && car.accident_count !== undefined) {
+        specs['Accident History'] = `Accidents: ${car.accident_count}. Total repairs: ${car.repairs_total_cost ? car.repairs_total_cost.toLocaleString() + ' KRW' : '0'}`;
+      }
 
       return {
         id: car.id,
         title: car.brand && car.model ? `${car.brand} ${car.model}` : 'Unknown',
         description: car.description || '',
+        dealer_description: car.description || '',
         price: car.price || 0,
         year: car.year || 0,
         mileage: car.mileage || 0,
@@ -156,6 +160,12 @@ export class ItemService {
         source: 'encar',
         brand: car.brand,
         model: car.model,
+        color: car.color || '',
+        inspectionAvailable: !!(car.inspection || car.diagnosis),
+        engineCc: car.displacement || 0,
+        options: car.options,
+        diagnosis: car.diagnosis,
+        inspection: car.inspection,
       };
     } catch (error) {
       if (error instanceof NotFoundException) throw error;

@@ -46,6 +46,7 @@ export interface ItemDetailDto {
   id: string;
   title: string;
   description: string;
+  dealer_description?: string;
   price: number;
   year: number;
   mileage: number;
@@ -62,6 +63,9 @@ export interface ItemDetailDto {
   location?: string;
   inspectionAvailable?: boolean;
   engineCc?: number;
+  options?: any;
+  diagnosis?: any;
+  inspection?: any;
 }
 
 // ─── Brand translation ────────────────────────────────────────────────────
