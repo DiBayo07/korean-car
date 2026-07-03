@@ -98,6 +98,9 @@ export class EncarCar {
   @Column('json', { nullable: true })
   inspection: Record<string, unknown> | null;
 
+  @Column('text', { nullable: true })
+  description: string | null;
+
   @CreateDateColumn({ name: 'created_at' })
   created_at: Date;
 

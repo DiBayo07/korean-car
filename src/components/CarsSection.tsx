@@ -64,7 +64,7 @@ export const CarsSection: React.FC<CarsSectionProps> = ({ t, vehicles }) => {
               onClick={() => setActiveTab(brand)}
               className={`px-5 py-2 text-xs font-semibold rounded-full transition-all duration-200 ${
                 activeTab === brand
-                  ? 'bg-brand-500 text-white shadow-md shadow-brand-500/15'
+                  ? 'bg-slate-900 text-white shadow-md shadow-slate-900/15'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
               }`}
             >

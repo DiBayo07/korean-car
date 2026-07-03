@@ -59,7 +59,7 @@ export const Footer: React.FC<FooterProps> = ({ t, setActiveSection }) => {
           <div className="flex items-center gap-4">
             {/* Instagram */}
             <a 
-              href="https://instagram.com/kg_motors_korea" 
+              href="https://www.instagram.com/mkautokorea?igsh=YjNhYjRkYmpycWE2" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="p-2.5 bg-white/5 border border-white/10 hover:border-kg-gold hover:text-kg-gold rounded-full transition-all text-slate-300"
@@ -71,38 +71,39 @@ export const Footer: React.FC<FooterProps> = ({ t, setActiveSection }) => {
               </svg>
             </a>
 
-            {/* TikTok Custom SVG */}
+            {/* Telegram */}
             <a 
-              href="https://tiktok.com/@kg_motors_korea" 
+              href="https://t.me/mkautokorea" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="p-2.5 bg-white/5 border border-white/10 hover:border-kg-gold hover:text-kg-gold rounded-full transition-all text-slate-300"
             >
               <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.02 1.59 4.23.95 1.15 2.29 1.94 3.73 2.2v3.91c-1.3-.08-2.58-.55-3.64-1.29-.68-.48-1.28-1.09-1.74-1.8v8.66c.09 1.9-.57 3.82-1.79 5.25-1.57 1.83-4.04 2.8-6.44 2.52-2.52-.25-4.83-1.8-5.99-4.07-1.46-2.73-.99-6.32 1.17-8.54 1.7-1.78 4.26-2.48 6.6-1.84V11.2c-1.12-.39-2.38-.19-3.32.53-.99.72-1.51 1.96-1.34 3.19.14 1.25.96 2.37 2.11 2.87.89.4 1.94.38 2.82-.07.72-.37 1.2-1.1 1.28-1.92L12.52.02z"/>
-              </svg>
-            </a>
-
-            {/* YouTube */}
-            <a 
-              href="https://youtube.com/kg_motors_korea" 
-              target="_blank" 
-              rel="noopener noreferrer" 
-              className="p-2.5 bg-white/5 border border-white/10 hover:border-kg-gold hover:text-kg-gold rounded-full transition-all text-slate-300"
-            >
-              <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                <path d="M23.498 6.163a3.003 3.003 0 0 0-2.11-2.11C19.518 3.545 12 3.545 12 3.545s-7.518 0-9.388.508a3.003 3.003 0 0 0-2.11 2.11C0 8.033 0 12 0 12s0 3.967.502 5.837a3.003 3.003 0 0 0 2.11 2.11c1.87.508 9.388.508 9.388.508s7.518 0 9.388-.508a3.003 3.003 0 0 0 2.11-2.11C24 15.967 24 12 24 12s0-3.967-.502-5.837zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-1-.65-.35-1 .22-1.62.15-.16 2.72-2.5 2.77-2.7.01-.03.01-.15-.06-.21-.07-.06-.17-.04-.25-.02-.11.02-1.92 1.21-5.42 3.56-.51.35-.97.52-1.38.51-.45-.01-1.32-.26-1.97-.47-.8-.26-1.43-.4-1.38-.85.03-.23.35-.47.96-.71 3.76-1.64 6.27-2.72 7.54-3.25 3.58-1.5 4.32-1.76 4.81-1.77.11 0 .35.03.5.15.13.1.17.24.18.34z"/>
               </svg>
             </a>
 
             {/* WhatsApp */}
             <a 
-              href="https://wa.me/821033334019" 
+              href="https://wa.me/821065914114" 
               target="_blank" 
               rel="noopener noreferrer" 
               className="p-2.5 bg-white/5 border border-white/10 hover:border-kg-gold hover:text-kg-gold rounded-full transition-all text-slate-300"
             >
               <MessageCircle size={16} />
+            </a>
+
+            {/* Gmail */}
+            <a 
+              href="mailto:baktybek.kokoev04@gmail.com" 
+              target="_blank" 
+              rel="noopener noreferrer" 
+              className="p-2.5 bg-white/5 border border-white/10 hover:border-kg-gold hover:text-kg-gold rounded-full transition-all text-slate-300"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
             </a>
           </div>
         </div>
@@ -146,8 +147,8 @@ export const Footer: React.FC<FooterProps> = ({ t, setActiveSection }) => {
           <ul className="space-y-3.5 text-sm">
             <li className="flex items-start gap-2.5">
               <span className="font-semibold text-white">KR:</span>
-              <a href="tel:+821033334019" className="hover:text-white transition-colors">
-                +82 10-3333-4019
+              <a href="tel:+821065914114" className="hover:text-white transition-colors">
+                +82 10-6591-4114
               </a>
             </li>
             <li className="flex items-start gap-2.5">
@@ -158,8 +159,8 @@ export const Footer: React.FC<FooterProps> = ({ t, setActiveSection }) => {
             </li>
             <li className="flex items-start gap-2.5">
               <span className="font-semibold text-white">Email:</span>
-              <a href="mailto:contact.smtrading@gmail.com" className="hover:text-white transition-colors break-all">
-                contact.kgmotors@gmail.com
+              <a href="mailto:baktybek.kokoev04@gmail.com" className="hover:text-white transition-colors break-all">
+                baktybek.kokoev04@gmail.com
               </a>
             </li>
             <li className="flex flex-col gap-1">
@@ -178,7 +179,7 @@ export const Footer: React.FC<FooterProps> = ({ t, setActiveSection }) => {
 
       <div className="max-w-7xl mx-auto mt-16 pt-8 border-t border-white/5 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs font-semibold text-slate-500">
         <span>
-          © {new Date().getFullYear()} KG Motors Korea. All rights reserved.
+          © {new Date().getFullYear()} MK Auto Korea. All rights reserved.
         </span>
         <div className="flex gap-4">
           <a href="#" className="hover:text-slate-300">Privacy Policy</a>

@@ -40,8 +40,8 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ t }) => {
               </div>
               <div>
                 <span className="text-xs text-slate-400 font-bold block mb-1">WhatsApp / Telegram</span>
-                <a href="tel:+821033334019" className="text-base font-extrabold hover:text-kg-gold transition-colors">
-                  +82 10-3333-4019
+                <a href="tel:+821065914114" className="text-base font-extrabold hover:text-kg-gold transition-colors">
+                  +82 10-6591-4114
                 </a>
                 <span className="text-xs text-slate-400 block mt-0.5">Bishkek Line: +996 555-777-888</span>
               </div>
@@ -54,10 +54,10 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ t }) => {
               </div>
               <div>
                 <span className="text-xs text-slate-400 font-bold block mb-1">Email</span>
-                <a href="mailto:contact.smtrading@gmail.com" className="text-base font-extrabold hover:text-kg-gold transition-colors">
-                  contact.kgmotors@gmail.com
+                <a href="mailto:baktybek.kokoev04@gmail.com" className="text-base font-extrabold hover:text-kg-gold transition-colors">
+                  baktybek.kokoev04@gmail.com
                 </a>
-                <span className="text-xs text-slate-400 block mt-0.5">kgmotors.korea@gmail.com</span>
+                <span className="text-xs text-slate-400 block mt-0.5">mkautokorea@gmail.com</span>
               </div>
             </div>
 
@@ -72,7 +72,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ t }) => {
                   #813 Hizen Star, 254 Techno Junang-daero, Yuga-eup, Dalseong-gun, Daegu, S.Korea
                 </p>
                 
-                {/* Kyrgyz vibe: Local showroom address */}
+                {/* showrooms address */}
                 <span className="text-xs text-slate-400 font-bold block mt-3 mb-1">Showroom (Kyrgyzstan)</span>
                 <p className="text-sm text-slate-200 leading-relaxed font-semibold">
                   120 Chuy Avenue, Bishkek, Kyrgyzstan (Altyn Motors Plaza)
@@ -95,7 +95,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ t }) => {
             <div className="space-y-4">
               {/* WhatsApp Button */}
               <a
-                href="https://wa.me/821033334019"
+                href="https://wa.me/821065914114"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-4 px-6 bg-[#25d366] hover:bg-[#20ba5a] active:scale-[0.98] text-white font-extrabold text-sm rounded-xl flex items-center justify-center gap-3 shadow-lg hover:shadow-[#25d366]/20 transition-all duration-200"
@@ -104,9 +104,9 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ t }) => {
                 <span>{t.contactWhatsApp}</span>
               </a>
 
-              {/* Viber (Kyrgyz Vibe Telegram) Button */}
+              {/* Telegram Button */}
               <a
-                href="https://t.me/kg_motors_korea" // Kyrgyz vibe Telegram link
+                href="https://t.me/mkautokorea"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="w-full py-4 px-6 bg-[#5969ea] hover:bg-[#4958d6] active:scale-[0.98] text-white font-extrabold text-sm rounded-xl flex items-center justify-center gap-3 shadow-lg hover:shadow-[#5969ea]/20 transition-all duration-200"
@@ -117,7 +117,7 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ t }) => {
 
               {/* Email Button */}
               <a
-                href="mailto:contact.smtrading@gmail.com"
+                href="mailto:baktybek.kokoev04@gmail.com"
                 className="w-full py-4 px-6 bg-[#242c3d] hover:bg-[#2b354a] border border-white/5 active:scale-[0.98] text-slate-200 font-extrabold text-sm rounded-xl flex items-center justify-center gap-3 shadow-lg transition-all duration-200"
               >
                 <Mail size={18} />

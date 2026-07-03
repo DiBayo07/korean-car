@@ -150,6 +150,24 @@ export class DatabaseService {
             )
           : [];
 
+        let parsedYear: number | null = null;
+        if (general.model_year) {
+          parsedYear = Number(general.model_year);
+        } else if (general.year) {
+          parsedYear = Number(general.year);
+        } else if (general.form_year) {
+          parsedYear = Number(general.form_year);
+        } else if (general.date_car_registration) {
+          const regStr = String(general.date_car_registration);
+          const match = regStr.match(/^(\d{4})/);
+          if (match) {
+            parsedYear = parseInt(match[1], 10);
+          }
+        }
+        if (parsedYear && parsedYear > 100000) {
+          parsedYear = Math.floor(parsedYear / 100);
+        }
+
         const encarCar: Partial<EncarCar> = {
           id: carId,
           donor_inner_id: ids.donor_inner_id || null,
@@ -159,7 +177,7 @@ export class DatabaseService {
           model: general.model?.en || null,
           price: general.price ?? null,
           mileage: general.mileage ?? null,
-          year: general.model_year ?? null,
+          year: parsedYear,
           fuel: general.fuel_type?.en || null,
           transmission: general.transmission_type?.en || null,
           body_type: general.body_type?.en || null,
@@ -181,6 +199,7 @@ export class DatabaseService {
           options: raw.options || null,
           diagnosis: raw.diagnosis || null,
           inspection: raw.inspection || null,
+          description: raw.description || raw.note || general.description || general.note || null,
         };
 
         await this.encarCarRepository.upsert(encarCar, ['id']);
@@ -233,8 +252,14 @@ export class DatabaseService {
     } = filters;
 
     const where: Record<string, unknown> = {};
-    if (brand) where.brand = Like(`%${brand}%`);
-    if (model) where.model = Like(`%${model}%`);
+    if (brand) {
+      const cleanBrand = brand.replace(/-/g, '%');
+      where.brand = Like(`%${cleanBrand}%`);
+    }
+    if (model) {
+      const cleanModel = model.replace(/-/g, '%');
+      where.model = Like(`%${cleanModel}%`);
+    }
     if (fuel) where.fuel = Like(`%${fuel}%`);
     if (transmission) where.transmission = Like(`%${transmission}%`);
 
@@ -274,12 +299,13 @@ export class DatabaseService {
    */
   async getModelsByBrand(brandSlug: string): Promise<{ name: string; slug: string }[]> {
     try {
+      const cleanBrand = brandSlug.replace(/-/g, '%');
       const cars = await this.encarCarRepository
         .createQueryBuilder('car')
         .select('DISTINCT car.model', 'name')
         .where('car.model IS NOT NULL')
         .andWhere("car.model != ''")
-        .andWhere('LOWER(car.brand) LIKE LOWER(:brandSlug)', { brandSlug: `%${brandSlug}%` })
+        .andWhere('LOWER(car.brand) LIKE LOWER(:brandSlug)', { brandSlug: `%${cleanBrand}%` })
         .groupBy('car.model')
         .orderBy('car.model', 'ASC')
         .getRawMany();
@@ -320,21 +346,39 @@ export class DatabaseService {
    */
   async getModelsByManufacturerAndModelGroup(manufacturerSlug: string, modelGroupSlug: string): Promise<{ name: string; slug: string }[]> {
     try {
+      const cleanManufacturer = manufacturerSlug.replace(/-/g, '%');
+      const cleanModelGroup = modelGroupSlug.replace(/-/g, '%');
       const cars = await this.encarCarRepository
         .createQueryBuilder('car')
-        .select('DISTINCT car.model', 'name')
+        .select('car.model', 'name')
+        .addSelect('MIN(car.year)', 'minYear')
+        .addSelect('MAX(car.year)', 'maxYear')
         .where('car.model IS NOT NULL')
         .andWhere("car.model != ''")
-        .andWhere('LOWER(car.brand) LIKE LOWER(:manufacturerSlug)', { manufacturerSlug: `%${manufacturerSlug}%` })
-        .andWhere('LOWER(car.model) LIKE LOWER(:modelGroupSlug)', { modelGroupSlug: `%${modelGroupSlug}%` })
+        .andWhere('LOWER(car.brand) LIKE LOWER(:manufacturerSlug)', { manufacturerSlug: `%${cleanManufacturer}%` })
+        .andWhere('LOWER(car.model) LIKE LOWER(:modelGroupSlug)', { modelGroupSlug: `%${cleanModelGroup}%` })
         .groupBy('car.model')
         .orderBy('car.model', 'ASC')
         .getRawMany();
 
-      return cars.map((c: { name: string }) => ({
-        name: c.name,
-        slug: c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-      }));
+      return cars.map((c: { name: string; minYear: number | null; maxYear: number | null }) => {
+        let nameWithYears = c.name;
+        const minYear = c.minYear && c.minYear > 1000 ? c.minYear : null;
+        const maxYear = c.maxYear && c.maxYear > 1000 ? c.maxYear : null;
+        if (minYear && maxYear) {
+          if (minYear === maxYear) {
+            nameWithYears = `${c.name} (${minYear})`;
+          } else {
+            nameWithYears = `${c.name} (${minYear} - ${maxYear})`;
+          }
+        } else if (minYear) {
+          nameWithYears = `${c.name} (${minYear})`;
+        }
+        return {
+          name: nameWithYears,
+          slug: c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
+        };
+      });
     } catch (error) {
       this.logger.error(`Failed to get models by manufacturer and model group: ${(error as Error).message}`);
       return [];

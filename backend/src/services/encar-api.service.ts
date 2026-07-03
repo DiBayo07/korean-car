@@ -144,7 +144,7 @@ export class ItemService {
       return {
         id: car.id,
         title: car.brand && car.model ? `${car.brand} ${car.model}` : 'Unknown',
-        description: '',
+        description: car.description || '',
         price: car.price || 0,
         year: car.year || 0,
         mileage: car.mileage || 0,
