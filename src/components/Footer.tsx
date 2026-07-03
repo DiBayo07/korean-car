@@ -5,13 +5,15 @@ import type { TranslationDict } from '../lib/translations';
 interface FooterProps {
   t: TranslationDict;
   setActiveSection: (section: string) => void;
+  onHomeClick?: () => void;
 }
 
-export const Footer: React.FC<FooterProps> = ({ t, setActiveSection }) => {
+export const Footer: React.FC<FooterProps> = ({ t, setActiveSection, onHomeClick }) => {
   const handleNavClick = (sectionId: string) => {
     setActiveSection(sectionId);
     
     if (sectionId === 'home') {
+      if (onHomeClick) onHomeClick();
       window.scrollTo({ top: 0, behavior: 'smooth' });
       return;
     }
@@ -36,7 +38,7 @@ export const Footer: React.FC<FooterProps> = ({ t, setActiveSection }) => {
       <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-12 gap-10">
         
         {/* Left column - Brand & Description */}
-        <div className="md:col-span-5 space-y-6">
+        <div className="md:col-span-7 space-y-6">
           <div 
             className="flex items-center gap-3 cursor-pointer select-none"
             onClick={() => handleNavClick('home')}
@@ -109,52 +111,16 @@ export const Footer: React.FC<FooterProps> = ({ t, setActiveSection }) => {
         </div>
 
 
-        {/* Middle column - Quick Links */}
-        <div className="md:col-span-3 space-y-4">
-          <h4 className="text-sm font-extrabold uppercase text-white tracking-widest">
-            {t.footerLinks}
-          </h4>
-          <ul className="space-y-2.5 text-sm">
-            <li>
-              <button onClick={() => handleNavClick('cars')} className="hover:text-white transition-colors">
-                {t.navCatalog}
-              </button>
-            </li>
-            <li>
-              <button onClick={() => handleNavClick('services')} className="hover:text-white transition-colors">
-                {t.navServices}
-              </button>
-            </li>
-            <li>
-              <button onClick={() => handleNavClick('about')} className="hover:text-white transition-colors">
-                {t.navAbout}
-              </button>
-            </li>
-            <li>
-              <button onClick={() => handleNavClick('contact')} className="hover:text-white transition-colors">
-                {t.navContact}
-              </button>
-            </li>
-
-          </ul>
-        </div>
-
         {/* Right column - Contacts */}
-        <div className="md:col-span-4 space-y-4">
+        <div className="md:col-span-5 space-y-4">
           <h4 className="text-sm font-extrabold uppercase text-white tracking-widest">
             {t.footerContact}
           </h4>
           <ul className="space-y-3.5 text-sm">
             <li className="flex items-start gap-2.5">
-              <span className="font-semibold text-white">KR:</span>
+              <span className="font-semibold text-white">Phone:</span>
               <a href="tel:+821065914114" className="hover:text-white transition-colors">
                 +82 10-6591-4114
-              </a>
-            </li>
-            <li className="flex items-start gap-2.5">
-              <span className="font-semibold text-white">KG:</span>
-              <a href="tel:+996555777888" className="hover:text-white transition-colors">
-                +996 555-777-888
               </a>
             </li>
             <li className="flex items-start gap-2.5">
@@ -162,15 +128,6 @@ export const Footer: React.FC<FooterProps> = ({ t, setActiveSection }) => {
               <a href="mailto:baktybek.kokoev04@gmail.com" className="hover:text-white transition-colors break-all">
                 baktybek.kokoev04@gmail.com
               </a>
-            </li>
-            <li className="flex flex-col gap-1">
-              <span className="font-semibold text-white">Addresses:</span>
-              <span className="text-xs leading-relaxed">
-                • #813 Hizen Star, 254 Techno Junang-daero, Daegu, Korea
-              </span>
-              <span className="text-xs leading-relaxed">
-                • 120 Chuy Avenue, Bishkek, Kyrgyzstan
-              </span>
             </li>
           </ul>
         </div>

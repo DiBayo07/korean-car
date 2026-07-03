@@ -152,14 +152,14 @@ export const Header: React.FC<HeaderProps> = ({
             onClick={handleHomeClick}
             className={`text-sm font-medium tracking-wide transition-colors ${isActive(basePath) || isActive(`${basePath}/`) ? 'text-kg-gold' : 'text-slate-300 hover:text-white'}`}
           >
-            {currentLang === 'en' ? 'Home' : currentLang === 'ru' ? 'Главная' : 'Башкы бет'}
+            {t.navHome}
           </Link>
           <Link
             to={`${basePath}/cars`}
             className={`text-sm font-medium tracking-wide transition-colors flex items-center gap-1.5 ${isActive(`${basePath}/cars`) ? 'text-kg-gold' : 'text-slate-300 hover:text-white'}`}
           >
             <Car size={14} />
-            {currentLang === 'en' ? 'Cars' : currentLang === 'ru' ? 'Авто' : 'Унаалар'}
+            {t.navCars}
           </Link>
           <button 
             onClick={() => handleScrollToSection('services')} 
@@ -281,7 +281,7 @@ export const Header: React.FC<HeaderProps> = ({
               }}
               className={`block w-full text-left py-2 px-3 rounded-lg text-sm font-semibold ${isActive(basePath) || isActive(`${basePath}/`) ? 'bg-brand-500/10 text-kg-gold' : 'text-slate-300 hover:bg-white/5'}`}
             >
-              {currentLang === 'en' ? 'Home' : currentLang === 'ru' ? 'Главная' : 'Башкы бет'}
+              {t.navHome}
             </Link>
             <Link
               to={`${basePath}/cars`}
@@ -289,7 +289,7 @@ export const Header: React.FC<HeaderProps> = ({
               className={`block w-full text-left py-2 px-3 rounded-lg text-sm font-semibold flex items-center gap-2 ${isActive(`${basePath}/cars`) ? 'bg-brand-500/10 text-kg-gold' : 'text-slate-300 hover:bg-white/5'}`}
             >
               <Car size={16} />
-              {currentLang === 'en' ? 'Cars' : currentLang === 'ru' ? 'Авто' : 'Унаалар'}
+              {t.navCars}
             </Link>
             <button
               onClick={() => handleScrollToSection('services')}

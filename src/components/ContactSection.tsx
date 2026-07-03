@@ -1,5 +1,5 @@
 import React from 'react';
-import { Phone, Mail, MapPin, MessageCircle, Send } from 'lucide-react';
+import { Phone, Mail, MessageCircle, Send } from 'lucide-react';
 import type { TranslationDict } from '../lib/translations';
 
 
@@ -43,7 +43,6 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ t }) => {
                 <a href="tel:+821065914114" className="text-base font-extrabold hover:text-kg-gold transition-colors">
                   +82 10-6591-4114
                 </a>
-                <span className="text-xs text-slate-400 block mt-0.5">Bishkek Line: +996 555-777-888</span>
               </div>
             </div>
 
@@ -58,25 +57,6 @@ export const ContactSection: React.FC<ContactSectionProps> = ({ t }) => {
                   baktybek.kokoev04@gmail.com
                 </a>
                 <span className="text-xs text-slate-400 block mt-0.5">mkautokorea@gmail.com</span>
-              </div>
-            </div>
-
-            {/* Address */}
-            <div className="flex items-start gap-4">
-              <div className="p-3 bg-white/5 rounded-xl border border-white/10 text-kg-gold mt-1">
-                <MapPin size={20} />
-              </div>
-              <div>
-                <span className="text-xs text-slate-400 font-bold block mb-1">Head Office (South Korea)</span>
-                <p className="text-sm text-slate-200 leading-relaxed font-semibold">
-                  #813 Hizen Star, 254 Techno Junang-daero, Yuga-eup, Dalseong-gun, Daegu, S.Korea
-                </p>
-                
-                {/* showrooms address */}
-                <span className="text-xs text-slate-400 font-bold block mt-3 mb-1">Showroom (Kyrgyzstan)</span>
-                <p className="text-sm text-slate-200 leading-relaxed font-semibold">
-                  120 Chuy Avenue, Bishkek, Kyrgyzstan (Altyn Motors Plaza)
-                </p>
               </div>
             </div>
           </div>

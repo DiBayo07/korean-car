@@ -67,7 +67,8 @@ function App() {
   const clearSearch = useCallback(() => {
     setSearchResults(null);
     setSearchCriteria(null);
-  }, []);
+    setEncarFilters({});
+  }, [setEncarFilters]);
 
   // Handler for encar API filter changes from Hero
   const handleEncarFilterChange = useCallback((filters: UseVehiclesFilters) => {
@@ -92,6 +93,7 @@ function App() {
     <main className="flex-grow">
       {/* Hero Section */}
       <Hero
+        key={searchCriteria ? 'filtered' : 'initial'}
         t={t}
         lang={lang}
         onSearch={handleSearch}
@@ -290,6 +292,7 @@ function App() {
       <Footer
         t={t}
         setActiveSection={() => {}}
+        onHomeClick={clearSearch}
       />
     </div>
   );

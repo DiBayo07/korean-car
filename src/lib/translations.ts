@@ -1,6 +1,8 @@
 export type Language = 'en' | 'ru' | 'ky' | 'ko' | 'mn' | 'ro' | 'de' | 'sq';
 
 export interface TranslationDict {
+  navHome: string;
+  navCars: string;
   navCatalog: string;
   navAuction: string;
   navSalvage: string;
@@ -44,6 +46,8 @@ export interface TranslationDict {
 
 export const translations: Record<Language, TranslationDict> = {
   en: {
+    navHome: 'Home',
+    navCars: 'Cars',
     navCatalog: 'Catalog',
     navAuction: 'Auction',
     navSalvage: 'Salvage',
@@ -85,6 +89,8 @@ export const translations: Record<Language, TranslationDict> = {
     priceConverted: 'approx.',
   },
   ru: {
+    navHome: 'Главная',
+    navCars: 'Авто',
     navCatalog: 'Каталог',
     navAuction: 'Аукцион',
     navSalvage: 'Аварийные',
@@ -126,6 +132,8 @@ export const translations: Record<Language, TranslationDict> = {
     priceConverted: 'примерно',
   },
   ky: {
+    navHome: 'Башкы бет',
+    navCars: 'Унаалар',
     navCatalog: 'Каталог',
     navAuction: 'Аукцион',
     navSalvage: 'Авариялык',
@@ -167,6 +175,8 @@ export const translations: Record<Language, TranslationDict> = {
     priceConverted: 'болжол менен',
   },
   ko: {
+    navHome: '홈',
+    navCars: '차량',
     navCatalog: '카탈로그',
     navAuction: '경매',
     navSalvage: '사고차',
@@ -208,6 +218,8 @@ export const translations: Record<Language, TranslationDict> = {
     priceConverted: '약',
   },
   mn: {
+    navHome: 'Нүүр хуудас',
+    navCars: 'Машин',
     navCatalog: 'Каталог',
     navAuction: 'Дуудлага худалдаа',
     navSalvage: 'Осолд орсон',
@@ -249,6 +261,8 @@ export const translations: Record<Language, TranslationDict> = {
     priceConverted: 'ойролцоогоор',
   },
   ro: {
+    navHome: 'Acasă',
+    navCars: 'Mașini',
     navCatalog: 'Catalog',
     navAuction: 'Licitație',
     navSalvage: 'Avariate',
@@ -290,6 +304,8 @@ export const translations: Record<Language, TranslationDict> = {
     priceConverted: 'aproximativ',
   },
   de: {
+    navHome: 'Startseite',
+    navCars: 'Autos',
     navCatalog: 'Katalog',
     navAuction: 'Auktion',
     navSalvage: 'Unfallwagen',
@@ -331,6 +347,8 @@ export const translations: Record<Language, TranslationDict> = {
     priceConverted: 'ca.',
   },
   sq: {
+    navHome: 'Ballina',
+    navCars: 'Makinat',
     navCatalog: 'Katalogu',
     navAuction: 'Ankandi',
     navSalvage: 'Të dëmtuara',
