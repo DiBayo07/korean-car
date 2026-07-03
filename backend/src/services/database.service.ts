@@ -132,8 +132,16 @@ export class DatabaseService {
     let saved = 0;
     let failed = 0;
 
+    const cleanNum = (val: any): number | null => {
+      if (val === null || val === undefined) return null;
+      const num = Number(val);
+      return !isNaN(num) ? num : null;
+    };
+
     for (const raw of cars) {
       try {
+        this.logger.log('Received car data: ' + JSON.stringify(raw, null, 2));
+
         const ids = raw.ids || {};
         const general = raw.general || {};
         const carId = ids.id;
@@ -175,23 +183,23 @@ export class DatabaseService {
           vehicle_no: ids.vehicle_no || null,
           brand: general.brand?.en || null,
           model: general.model?.en || null,
-          price: general.price ?? null,
-          mileage: general.mileage ?? null,
-          year: parsedYear,
+          price: cleanNum(general.price),
+          mileage: cleanNum(general.mileage),
+          year: cleanNum(parsedYear),
           fuel: general.fuel_type?.en || null,
           transmission: general.transmission_type?.en || null,
           body_type: general.body_type?.en || null,
           color: general.exterior_color?.en || null,
           interior_color: general.interior_color?.en || null,
-          displacement: general.displacement ?? null,
-          seat_count: general.seat_count ?? null,
+          displacement: cleanNum(general.displacement),
+          seat_count: cleanNum(general.seat_count),
           has_accidents: general.has_accidents ?? null,
-          accident_count: general.accident_count ?? null,
+          accident_count: cleanNum(general.accident_count),
           has_repairs: general.has_repairs ?? null,
           has_painting: general.has_painting ?? null,
-          repairs_total_cost: general.repairs_total_cost ?? null,
+          repairs_total_cost: cleanNum(general.repairs_total_cost),
           has_waterlog: general.has_waterlog ?? null,
-          owner_changes_count: general.owner_changes_count ?? null,
+          owner_changes_count: cleanNum(general.owner_changes_count),
           date_car_registration: general.date_car_registration || null,
           date_post_created: general.date_post_created || null,
           date_post_updated: general.date_post_updated || null,

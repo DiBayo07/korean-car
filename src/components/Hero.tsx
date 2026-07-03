@@ -194,7 +194,7 @@ export const Hero: React.FC<HeroProps> = ({
             onClick={() => setShowFilters(!showFilters)}
             className={`sm:w-auto px-4 py-4 rounded-2xl flex items-center justify-center gap-2 transition-all duration-300 border group ${
               showFilters || hasActiveFilters
-                ? 'bg-brand-500 text-white border-brand-500 shadow-lg shadow-brand-500/20'
+                ? 'bg-blue-600 text-white border-blue-600 shadow-lg shadow-blue-500/20'
                 : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border-slate-200'
             }`}
             title={getLangText(lang, 'Filters', 'Фильтры', 'Чыпкалар')}
