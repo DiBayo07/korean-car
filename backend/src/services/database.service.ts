@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, Like, ILike, Between, In, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
+import { Repository, Like, Between, In, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { Car } from '../entities/car.entity';
 import { EncarCar } from '../entities/encar-car.entity';
 
@@ -319,14 +319,14 @@ export class DatabaseService {
     const where: Record<string, unknown> = {};
     if (brand) {
       const cleanBrand = brand.replace(/-/g, '%');
-      where.brand = ILike(`%${cleanBrand}%`);
+      where.brand = Like(`%${cleanBrand}%`);
     }
     if (model) {
       const cleanModel = model.replace(/-/g, '%');
-      where.model = ILike(`%${cleanModel}%`);
+      where.model = Like(`%${cleanModel}%`);
     }
-    if (fuel) where.fuel = ILike(`%${fuel}%`);
-    if (transmission) where.transmission = ILike(`%${transmission}%`);
+    if (fuel) where.fuel = Like(`%${fuel}%`);
+    if (transmission) where.transmission = Like(`%${transmission}%`);
 
     if (yearFrom !== undefined && yearTo !== undefined) {
       where.year = Between(yearFrom, yearTo);
