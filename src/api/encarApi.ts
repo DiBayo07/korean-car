@@ -240,6 +240,7 @@ export async function listVehicles(params: ListVehiclesParams = {}): Promise<Lis
   if (!res.ok) throw new Error(`Search failed: ${res.status}`);
 
   const data: any = await res.json();
+  console.log('Search API Response:', data);
   const isSuccessful = data.success === true || (data.success === undefined && Array.isArray(data.items));
   if (!isSuccessful) throw new Error(data.message || 'Search failed');
 
@@ -262,6 +263,7 @@ export async function getVehicleDetail(id: string | number): Promise<EncarDetail
     if (!res.ok) return null;
 
     const data: any = await res.json();
+    console.log('Detail API Response:', data);
     const d = (data.success === true && data.data) ? data.data : (data.id && data.title ? data : null);
     if (!d) return null;
     return {

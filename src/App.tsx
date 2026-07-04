@@ -58,7 +58,7 @@ function App() {
 
   // Handler for encar API filter changes from Hero
   const handleEncarFilterChange = useCallback((filters: UseVehiclesFilters) => {
-    setEncarFilters(filters);
+    setEncarFilters(filters, true);
   }, [setEncarFilters]);
 
   // --- CONDITIONAL RETURNS ---

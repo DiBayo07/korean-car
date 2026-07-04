@@ -254,6 +254,13 @@ export class DatabaseService implements OnApplicationBootstrap {
       return !isNaN(num) ? num : null;
     };
 
+    try {
+      const countBefore = await this.encarCarRepository.count();
+      this.logger.log(`Before save: ${countBefore} cars in DB`);
+    } catch (err) {
+      this.logger.error(`Failed to count cars before save: ${(err as Error).message}`);
+    }
+
     for (const raw of cars) {
       try {
         this.logger.log('Received car data: ' + JSON.stringify(raw, null, 2));
@@ -281,13 +288,25 @@ export class DatabaseService implements OnApplicationBootstrap {
           parsedYear = Number(general.year);
         } else if (general.form_year) {
           parsedYear = Number(general.form_year);
-        } else if (general.date_car_registration) {
-          const regStr = String(general.date_car_registration);
-          const match = regStr.match(/^(\d{4})/);
-          if (match) {
-            parsedYear = parseInt(match[1], 10);
+        }
+
+        if (!parsedYear || parsedYear <= 0) {
+          const regDate = general.date_car_registration || general.date_car_release || general.date_post_created;
+          if (regDate) {
+            const regStr = String(regDate);
+            const match4 = regStr.match(/(\d{4})/);
+            if (match4) {
+              parsedYear = parseInt(match4[1], 10);
+            } else {
+              const match2 = regStr.match(/^(\d{2})/);
+              if (match2) {
+                const y2 = parseInt(match2[1], 10);
+                parsedYear = y2 > 50 ? 1900 + y2 : 2000 + y2;
+              }
+            }
           }
         }
+
         if (parsedYear && parsedYear > 100000) {
           parsedYear = Math.floor(parsedYear / 100);
         }
@@ -316,7 +335,7 @@ export class DatabaseService implements OnApplicationBootstrap {
           repairs_total_cost: cleanNum(general.repairs_total_cost),
           has_waterlog: general.has_waterlog ?? null,
           owner_changes_count: cleanNum(general.owner_changes_count),
-          date_car_registration: general.date_car_registration || null,
+          date_car_registration: general.date_car_registration || general.date_car_release || null,
           date_post_created: general.date_post_created || null,
           date_post_updated: general.date_post_updated || null,
           photos: formattedPhotos,
@@ -334,6 +353,13 @@ export class DatabaseService implements OnApplicationBootstrap {
         );
         failed++;
       }
+    }
+
+    try {
+      const countAfter = await this.encarCarRepository.count();
+      this.logger.log(`After save: ${countAfter} cars in DB`);
+    } catch (err) {
+      this.logger.error(`Failed to count cars after save: ${(err as Error).message}`);
     }
 
     this.logger.log(`EncarCars saved: ${saved}, failed: ${failed}`);
@@ -411,7 +437,7 @@ export class DatabaseService implements OnApplicationBootstrap {
         take: Math.min(limit, 100),
         skip: offset,
       });
-      this.logger.log(`getCars query successful: found ${total} cars, returning ${items.length} items`);
+      this.logger.log(`Returning ${items.length} of ${total} cars`);
       for (const car of items) {
         if (!car.description || car.description.trim() === '') {
           car.description = this.generateDealerDescription(car);
