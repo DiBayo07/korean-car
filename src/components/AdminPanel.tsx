@@ -147,7 +147,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
               <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gradient-to-tr from-brand-700 to-brand-500 shadow-lg border border-white/10 mb-4">
                 <Lock size={24} className="text-kg-gold" />
               </div>
-              <h1 className="text-xl font-extrabold text-white">KG Motors Korea</h1>
+              <h1 className="text-xl font-extrabold text-white">mkautokeorea</h1>
               <p className="text-[10px] text-kg-gold font-bold uppercase tracking-wider mt-1">Панель администратора</p>
             </div>
 
@@ -217,7 +217,7 @@ export const AdminPanel: React.FC<AdminPanelProps> = ({ onBack }) => {
             </button>
             <div>
               <h1 className="text-xl font-extrabold flex items-center gap-2">
-                KG Motors <span className="font-light text-slate-400 text-sm">Dashboard</span>
+                mkautokeorea <span className="font-light text-slate-400 text-sm">Dashboard</span>
               </h1>
               <p className="text-[10px] text-kg-gold font-bold uppercase tracking-wider">Admin Panel · Inventory Manager</p>
             </div>

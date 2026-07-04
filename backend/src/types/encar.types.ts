@@ -24,6 +24,7 @@ export interface SearchItemDto {
   title: string;
   price: number;
   year: number;
+  month?: number;
   mileage: number;
   fuel: string;
   transmission: string;
@@ -49,6 +50,7 @@ export interface ItemDetailDto {
   dealer_description?: string;
   price: number;
   year: number;
+  month?: number;
   mileage: number;
   fuel: string;
   transmission: string;

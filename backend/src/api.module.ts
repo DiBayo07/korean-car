@@ -17,11 +17,27 @@ import { AppCacheModule } from './cache/cache.module';
 @Module({
   imports: [
     AppCacheModule,
-    TypeOrmModule.forRoot({
-      type: 'better-sqlite3',
-      database: (process.env.DATABASE_URL || '/app/data/cars.db').replace(/^sqlite:/, ''),
-      entities: [Car, EncarCar],
-      synchronize: true,
+    TypeOrmModule.forRootAsync({
+      useFactory: () => {
+        const dbUrl = process.env.DATABASE_URL;
+        if (dbUrl && (dbUrl.startsWith('postgres:') || dbUrl.startsWith('postgresql:'))) {
+          return {
+            type: 'postgres',
+            url: dbUrl,
+            entities: [Car, EncarCar],
+            synchronize: true,
+            ssl: {
+              rejectUnauthorized: false,
+            },
+          };
+        }
+        return {
+          type: 'better-sqlite3',
+          database: (dbUrl || '/app/data/cars.db').replace(/^sqlite:/, ''),
+          entities: [Car, EncarCar],
+          synchronize: true,
+        };
+      },
     }),
     TypeOrmModule.forFeature([Car, EncarCar]),
   ],

@@ -31,8 +31,9 @@ export const CarDetailsPage = ({ t: _t, lang: _lang }: CarDetailsPageProps) => {
     );
   }
 
+
   const handleWhatsApp = () => {
-    const usdPrice = car.price_usd || Math.round((car.price || 0) / 1350);
+    const usdPrice = car.price_usd || Math.round((car.price || 0) * 10000 / 1350);
     const text = `Hello, I am interested in this vehicle: ${car.brand} ${car.model}\nPrice: $${usdPrice.toLocaleString()}\nLink: ${window.location.href}`;
     window.open(`https://wa.me/821065914114?text=${encodeURIComponent(text)}`, '_blank');
   };
@@ -103,9 +104,9 @@ export const CarDetailsPage = ({ t: _t, lang: _lang }: CarDetailsPageProps) => {
               </div>
 
               <div className="mb-8">
-                <span className="text-4xl font-black text-kg-gold">${(car.price_usd || Math.round((car.price || 0) / 1350)).toLocaleString()}</span>
-                {car.price && <span className="text-slate-400 text-sm ml-2 block sm:inline">(₩{car.price.toLocaleString()} KRW)</span>}
-                <span className="text-slate-400 text-sm ml-2 block sm:inline">под ключ до Бишкека</span>
+                <span className="text-4xl font-black text-kg-gold">${(car.price_usd || Math.round((car.price || 0) * 10000 / 1350)).toLocaleString()}</span>
+                {car.price && <span className="text-slate-400 text-sm ml-2 block sm:inline">(₩{(car.price * 10000).toLocaleString()} KRW)</span>}
+                <span className="text-slate-400 text-sm ml-2 block sm:inline">под ключ</span>
               </div>
 
               {/* Specs Grid */}

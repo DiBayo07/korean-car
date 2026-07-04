@@ -46,21 +46,32 @@ export class SearchService {
         offset: (page - 1) * limit,
       });
 
-      const items: SearchItemDto[] = result.items.map((car) => ({
-        id: car.id,
-        title: car.brand && car.model ? `${car.brand} ${car.model}` : 'Unknown',
-        price: car.price || 0,
-        year: car.year || 0,
-        mileage: car.mileage || 0,
-        fuel: car.fuel || '',
-        transmission: car.transmission || '',
-        images: car.photos || [],
-        thumbnail: car.photos?.[0] || '',
-        source: 'encar' as const,
-        brand: car.brand,
-        model: car.model,
-        type: 'car',
-      }));
+      const items: SearchItemDto[] = result.items.map((car) => {
+        let month = 1;
+        const regDate = car.date_car_registration || car.date_post_created;
+        if (regDate) {
+          const match = String(regDate).match(/^\d{4}(\d{2})/);
+          if (match) {
+            month = parseInt(match[1], 10);
+          }
+        }
+        return {
+          id: car.id,
+          title: car.brand && car.model ? `${car.brand} ${car.model}` : 'Unknown',
+          price: car.price || 0,
+          year: car.year || 0,
+          month,
+          mileage: car.mileage || 0,
+          fuel: car.fuel || '',
+          transmission: car.transmission || '',
+          images: car.photos || [],
+          thumbnail: car.photos?.[0] || '',
+          source: 'encar' as const,
+          brand: car.brand,
+          model: car.model,
+          type: 'car',
+        };
+      });
 
       const response: SearchResponseDto = {
         total: result.total,
@@ -144,6 +155,15 @@ export class ItemService {
         specs['Accident History'] = `Accidents: ${car.accident_count}. Total repairs: ${car.repairs_total_cost ? car.repairs_total_cost.toLocaleString() + ' KRW' : '0'}`;
       }
 
+      let month = 1;
+      const regDate = car.date_car_registration || car.date_post_created;
+      if (regDate) {
+        const match = String(regDate).match(/^\d{4}(\d{2})/);
+        if (match) {
+          month = parseInt(match[1], 10);
+        }
+      }
+
       return {
         id: car.id,
         title: car.brand && car.model ? `${car.brand} ${car.model}` : 'Unknown',
@@ -151,6 +171,7 @@ export class ItemService {
         dealer_description: car.description || '',
         price: car.price || 0,
         year: car.year || 0,
+        month,
         mileage: car.mileage || 0,
         fuel: car.fuel || '',
         transmission: car.transmission || '',

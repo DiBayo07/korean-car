@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable, Logger, OnApplicationBootstrap } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, Like, ILike, Between, In, LessThanOrEqual, MoreThanOrEqual } from 'typeorm';
 import { Car } from '../entities/car.entity';
@@ -45,7 +45,7 @@ export interface RawCarInput {
 }
 
 @Injectable()
-export class DatabaseService {
+export class DatabaseService implements OnApplicationBootstrap {
   private readonly logger = new Logger(DatabaseService.name);
 
   constructor(
@@ -54,6 +54,60 @@ export class DatabaseService {
     @InjectRepository(EncarCar)
     private readonly encarCarRepository: Repository<EncarCar>,
   ) {}
+
+  async onApplicationBootstrap() {
+    try {
+      this.logger.log('Checking if database migration is needed for car years...');
+      
+      const count = await this.encarCarRepository
+        .createQueryBuilder('car')
+        .where('car.year IS NULL OR car.year = 0')
+        .getCount();
+
+      if (count > 0) {
+        this.logger.log(`Found ${count} cars with invalid/zero year. Running year auto-migration...`);
+        
+        const batchSize = 1000;
+        let offset = 0;
+        
+        while (true) {
+          const cars = await this.encarCarRepository.find({
+            where: [
+              { year: 0 },
+              { year: null }
+            ],
+            select: { id: true, date_car_registration: true, date_post_created: true },
+            take: batchSize,
+          });
+
+          if (cars.length === 0) break;
+
+          for (const car of cars) {
+            let parsedYear = 2020; // Default fallback year
+            const regDate = car.date_car_registration || car.date_post_created;
+            if (regDate) {
+              const regStr = String(regDate);
+              const match = regStr.match(/^(\d{4})/);
+              if (match) {
+                parsedYear = parseInt(match[1], 10);
+              }
+            }
+            car.year = parsedYear;
+          }
+
+          await this.encarCarRepository.save(cars);
+          offset += cars.length;
+          this.logger.log(`Migrated ${offset} / ${count} cars...`);
+        }
+        
+        this.logger.log('Car years migration completed successfully!');
+      } else {
+        this.logger.log('No cars need year migration.');
+      }
+    } catch (err) {
+      this.logger.error(`Failed to run car years migration: ${(err as Error).message}`);
+    }
+  }
 
   /**
    * Adds new cars to the database, skipping any that already exist by id.
