@@ -1,4 +1,4 @@
-import { useState, useEffect, useMemo, useCallback } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
@@ -39,35 +39,21 @@ function App() {
   const vehicles = encarVehicles as unknown as Vehicle[];
   
   // Search state (for home page hero search)
-  const [searchResults, setSearchResults] = useState<Vehicle[] | null>(null);
   const [searchCriteria, setSearchCriteria] = useState<{ brand?: string; model?: string } | null>(null);
 
   const t = translations[lang];
 
-  const carsOnly = useMemo(() => vehicles.filter(v => v.type === 'car'), [vehicles]);
-
   const handleSearch = useCallback((brand: string, model: string, generation: string) => {
     if (!brand && !model && !generation) {
-      setSearchResults(null);
       setSearchCriteria(null);
       return;
     }
-
-    const filtered = carsOnly.filter(v => {
-      const matchBrand = !brand || v.brand.toLowerCase() === brand.toLowerCase();
-      const matchModel = !model || v.model.toLowerCase() === model.toLowerCase();
-      const matchGen = !generation || v.generation?.toLowerCase() === generation.toLowerCase();
-      return matchBrand && matchModel && matchGen;
-    });
-
-    setSearchResults(filtered);
     setSearchCriteria({ brand, model });
-  }, [carsOnly]);
+  }, []);
 
   const clearSearch = useCallback(() => {
-    setSearchResults(null);
     setSearchCriteria(null);
-    setEncarFilters({});
+    setEncarFilters({}, true);
   }, [setEncarFilters]);
 
   // Handler for encar API filter changes from Hero
@@ -119,7 +105,7 @@ function App() {
               <strong className="text-brand-600">
                 {searchCriteria.brand || ''} {searchCriteria.model || ''}
               </strong>{' '}
-              ({searchResults?.length || 0} found)
+              ({vehicles.length} found)
             </span>
           </div>
           <button
@@ -134,7 +120,7 @@ function App() {
       {/* Cars Catalog Section */}
       <CarsSection
         t={t}
-        vehicles={searchResults !== null ? searchResults : vehicles}
+        vehicles={vehicles}
       />
 
       {/* Services Section */}

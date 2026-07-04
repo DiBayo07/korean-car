@@ -87,9 +87,15 @@ export class DatabaseService implements OnApplicationBootstrap {
             const regDate = car.date_car_registration || car.date_post_created;
             if (regDate) {
               const regStr = String(regDate);
-              const match = regStr.match(/^(\d{4})/);
-              if (match) {
-                parsedYear = parseInt(match[1], 10);
+              const match4 = regStr.match(/(\d{4})/);
+              if (match4) {
+                parsedYear = parseInt(match4[1], 10);
+              } else {
+                const match2 = regStr.match(/^(\d{2})/);
+                if (match2) {
+                  const y2 = parseInt(match2[1], 10);
+                  parsedYear = y2 > 50 ? 1900 + y2 : 2000 + y2;
+                }
               }
             }
             car.year = parsedYear;

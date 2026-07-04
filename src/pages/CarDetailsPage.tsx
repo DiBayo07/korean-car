@@ -181,18 +181,6 @@ export const CarDetailsPage = ({ t: _t, lang: _lang }: CarDetailsPageProps) => {
                 </div>
               )}
 
-              {car.accident_history && (
-                <div className="mb-8 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 flex items-start gap-3">
-                  <ShieldCheck className="text-amber-500 flex-shrink-0 mt-0.5" size={20} />
-                  <div>
-                    <h4 className="text-amber-400 font-bold text-sm mb-1">История аварий</h4>
-                    <p className="text-amber-500/80 text-xs leading-relaxed">
-                      {car.accident_history}
-                    </p>
-                  </div>
-                </div>
-              )}
-
               {/* WhatsApp Button */}
               <button
                 onClick={handleWhatsApp}
@@ -213,7 +201,7 @@ export const CarDetailsPage = ({ t: _t, lang: _lang }: CarDetailsPageProps) => {
                 </div>
                 <div className="flex items-center gap-2 text-sm text-slate-400">
                   <MapPin size={16} className="text-brand-500" />
-                  <span>Доставка ЖД/Авто до Бишкека за 25-45 дней</span>
+                  <span>Быстрая доставка ЖД/Автотранспортом за 25-45 дней</span>
                 </div>
               </div>
 

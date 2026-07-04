@@ -25,7 +25,7 @@ export interface UseVehiclesResult {
   hasMore: boolean;
   loadMore: () => void;
   refetch: () => void;
-  setFilters: (filters: UseVehiclesFilters) => void;
+  setFilters: (filters: UseVehiclesFilters, overwrite?: boolean) => void;
   filters: UseVehiclesFilters;
   // Catalog data for cascading filters
   manufacturers: CarapisManufacturer[];
@@ -147,8 +147,12 @@ export function useVehicles(initialFilters: UseVehiclesFilters = {}): UseVehicle
     fetchData(filters, 1);
   }, [filters, fetchData]);
 
-  const updateFilters = useCallback((newFilters: UseVehiclesFilters) => {
-    setFilters(prev => ({ ...prev, ...newFilters }));
+  const updateFilters = useCallback((newFilters: UseVehiclesFilters, overwrite = false) => {
+    if (overwrite) {
+      setFilters({ limit: 50, ...newFilters });
+    } else {
+      setFilters(prev => ({ ...prev, ...newFilters }));
+    }
   }, []);
 
   const hasMore = page < pages;

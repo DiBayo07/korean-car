@@ -47,19 +47,44 @@ export class SearchService {
       });
 
       const items: SearchItemDto[] = result.items.map((car) => {
+        let year = car.year || 0;
         let month = 1;
         const regDate = car.date_car_registration || car.date_post_created;
         if (regDate) {
-          const match = String(regDate).match(/^\d{4}(\d{2})/);
-          if (match) {
-            month = parseInt(match[1], 10);
+          const regStr = String(regDate);
+          
+          // Parse Year
+          const match4 = regStr.match(/(\d{4})/);
+          if (match4) {
+            const y4 = parseInt(match4[1], 10);
+            if (year <= 1000) year = y4;
+          } else {
+            const match2 = regStr.match(/^(\d{2})/);
+            if (match2) {
+              const y2 = parseInt(match2[1], 10);
+              const y4 = y2 > 50 ? 1900 + y2 : 2000 + y2;
+              if (year <= 1000) year = y4;
+            }
+          }
+
+          // Parse Month
+          const matchMonth = regStr.match(/^\d{4}(\d{2})/);
+          if (matchMonth) {
+            month = parseInt(matchMonth[1], 10);
+          } else {
+            const matchMonth2 = regStr.match(/^\d{2}(\d{2})/);
+            if (matchMonth2) {
+              month = parseInt(matchMonth2[1], 10);
+            }
           }
         }
+        if (year <= 1000) year = 2020; // default fallback
+
         return {
           id: car.id,
           title: car.brand && car.model ? `${car.brand} ${car.model}` : 'Unknown',
           price: car.price || 0,
-          year: car.year || 0,
+          year,
           month,
           mileage: car.mileage || 0,
           fuel: car.fuel || '',
@@ -143,25 +168,49 @@ export class ItemService {
         throw new NotFoundException(`Item ${id} not found`);
       }
 
+      let year = car.year || 0;
+      let month = 1;
+      const regDate = car.date_car_registration || car.date_post_created;
+      if (regDate) {
+        const regStr = String(regDate);
+        
+        // Parse Year
+        const match4 = regStr.match(/(\d{4})/);
+        if (match4) {
+          const y4 = parseInt(match4[1], 10);
+          if (year <= 1000) year = y4;
+        } else {
+          const match2 = regStr.match(/^(\d{2})/);
+          if (match2) {
+            const y2 = parseInt(match2[1], 10);
+            const y4 = y2 > 50 ? 1900 + y2 : 2000 + y2;
+            if (year <= 1000) year = y4;
+          }
+        }
+
+        // Parse Month
+        const matchMonth = regStr.match(/^\d{4}(\d{2})/);
+        if (matchMonth) {
+          month = parseInt(matchMonth[1], 10);
+        } else {
+          const matchMonth2 = regStr.match(/^\d{2}(\d{2})/);
+          if (matchMonth2) {
+            month = parseInt(matchMonth2[1], 10);
+          }
+        }
+      }
+      if (year <= 1000) year = 2020; // default fallback
+
       const specs: Record<string, string> = {};
       if (car.fuel) specs['Fuel'] = car.fuel;
       if (car.transmission) specs['Transmission'] = car.transmission;
       if (car.mileage) specs['Mileage'] = `${car.mileage.toLocaleString()} km`;
-      if (car.year) specs['Year'] = String(car.year);
+      specs['Year'] = String(year);
       if (car.body_type) specs['Body Type'] = car.body_type;
       if (car.color) specs['Color'] = car.color;
       if (car.displacement) specs['Displacement'] = `${car.displacement}cc`;
       if (car.accident_count !== null && car.accident_count !== undefined) {
         specs['Accident History'] = `Accidents: ${car.accident_count}. Total repairs: ${car.repairs_total_cost ? car.repairs_total_cost.toLocaleString() + ' KRW' : '0'}`;
-      }
-
-      let month = 1;
-      const regDate = car.date_car_registration || car.date_post_created;
-      if (regDate) {
-        const match = String(regDate).match(/^\d{4}(\d{2})/);
-        if (match) {
-          month = parseInt(match[1], 10);
-        }
       }
 
       return {
@@ -170,7 +219,7 @@ export class ItemService {
         description: car.description || '',
         dealer_description: car.description || '',
         price: car.price || 0,
-        year: car.year || 0,
+        year,
         month,
         mileage: car.mileage || 0,
         fuel: car.fuel || '',
