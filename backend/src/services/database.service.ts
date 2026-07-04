@@ -374,10 +374,9 @@ export class DatabaseService implements OnApplicationBootstrap {
     try {
       const cars = await this.encarCarRepository
         .createQueryBuilder('car')
-        .select('car.brand', 'name')
+        .select('DISTINCT car.brand', 'name')
         .where('car.brand IS NOT NULL')
         .andWhere("car.brand != ''")
-        .groupBy('LOWER(car.brand)')
         .orderBy('car.brand', 'ASC')
         .getRawMany();
 
@@ -466,7 +465,6 @@ export class DatabaseService implements OnApplicationBootstrap {
         .where('car.model IS NOT NULL')
         .andWhere("car.model != ''")
         .andWhere('LOWER(car.brand) LIKE LOWER(:brandSlug)', { brandSlug: `%${cleanBrand}%` })
-        .groupBy('car.model')
         .orderBy('car.model', 'ASC')
         .getRawMany();
 
