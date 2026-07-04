@@ -6,6 +6,7 @@ export interface SearchQuery {
   type?: string;
   brand?: string;
   model?: string;
+  year?: string;
   yearFrom?: string;
   yearTo?: string;
   priceFrom?: string;

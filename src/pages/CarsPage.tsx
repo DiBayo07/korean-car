@@ -125,11 +125,16 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, 
             <select
               value={selectedGeneration}
               onChange={(e) => {
-                setSelectedGeneration(e.target.value);
+                const val = e.target.value;
+                setSelectedGeneration(val);
                 const man = manufacturers.find(m => translateBrandName(m.name) === selectedBrand || m.slug === selectedBrand);
                 const mg = modelGroups.find(mg => mg.name === selectedModel || mg.slug === selectedModel);
-                const mod = models.find(m => m.name === e.target.value || m.slug === e.target.value);
-                if (man && mg && mod) setFilters({ manufacturer_slug: man.slug, model_group_slug: mg.slug, model_slug: mod.slug });
+                
+                const nextFilters: any = {};
+                if (man) nextFilters.manufacturer_slug = man.slug;
+                if (mg) nextFilters.model_group_slug = mg.slug;
+                if (val) nextFilters.year = parseInt(val, 10);
+                setFilters(nextFilters);
               }}
               disabled={!selectedModel}
               className="bg-transparent text-white text-sm font-semibold focus:outline-none cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
@@ -247,8 +252,9 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, 
                   if (man) filters.manufacturer_slug = man.slug;
                   const mg = modelGroups.find(mg => mg.name === selectedModel || mg.slug === selectedModel);
                   if (man && mg) filters.model_group_slug = mg.slug;
-                  const mod = models.find(m => m.name === selectedGeneration || m.slug === selectedGeneration);
-                  if (man && mg && mod) filters.model_slug = mod.slug;
+                  if (selectedGeneration) {
+                    filters.year = parseInt(selectedGeneration, 10);
+                  }
                   if (searchText.trim()) filters.search = searchText.trim();
                   if (yearFrom.trim()) filters.min_year = parseInt(yearFrom.trim(), 10);
                   if (yearTo.trim()) filters.max_year = parseInt(yearTo.trim(), 10);

@@ -36,6 +36,7 @@ export class SearchService {
       const result = await this.databaseService.getCars({
         brand: query.brand,
         model: query.model,
+        year: query.year ? Number(query.year) : undefined,
         yearFrom: query.yearFrom ? Number(query.yearFrom) : undefined,
         yearTo: query.yearTo ? Number(query.yearTo) : undefined,
         priceFrom: query.priceFrom ? Number(query.priceFrom) : undefined,

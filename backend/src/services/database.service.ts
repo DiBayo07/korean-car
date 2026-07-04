@@ -7,6 +7,7 @@ import { EncarCar } from '../entities/encar-car.entity';
 export interface CarFilters {
   brand?: string;
   model?: string;
+  year?: number;
   yearFrom?: number;
   yearTo?: number;
   priceFrom?: number;
@@ -398,7 +399,7 @@ export class DatabaseService implements OnApplicationBootstrap {
   async getCars(filters: CarFilters = {}): Promise<{ items: EncarCar[]; total: number }> {
     this.logger.log(`getCars called with filters: ${JSON.stringify(filters)}`);
     const {
-      brand, model, yearFrom, yearTo, priceFrom, priceTo, fuel, transmission,
+      brand, model, year, yearFrom, yearTo, priceFrom, priceTo, fuel, transmission,
       limit = 20, offset = 0,
     } = filters;
 
@@ -414,7 +415,9 @@ export class DatabaseService implements OnApplicationBootstrap {
     if (fuel) where.fuel = ILike(`%${fuel}%`);
     if (transmission) where.transmission = ILike(`%${transmission}%`);
 
-    if (yearFrom !== undefined && yearTo !== undefined) {
+    if (year !== undefined) {
+      where.year = year;
+    } else if (yearFrom !== undefined && yearTo !== undefined) {
       where.year = Between(yearFrom, yearTo);
     } else if (yearFrom !== undefined) {
       where.year = MoreThanOrEqual(yearFrom);
@@ -507,35 +510,18 @@ export class DatabaseService implements OnApplicationBootstrap {
       const cleanModelGroup = modelGroupSlug.replace(/-/g, '%');
       const cars = await this.encarCarRepository
         .createQueryBuilder('car')
-        .select('car.model', 'name')
-        .addSelect('MIN(car.year)', 'minYear')
-        .addSelect('MAX(car.year)', 'maxYear')
-        .where('car.model IS NOT NULL')
-        .andWhere("car.model != ''")
+        .select('DISTINCT car.year', 'year')
+        .where('car.year IS NOT NULL')
+        .andWhere('car.year > 1000')
         .andWhere('LOWER(car.brand) LIKE LOWER(:manufacturerSlug)', { manufacturerSlug: `%${cleanManufacturer}%` })
         .andWhere('LOWER(car.model) LIKE LOWER(:modelGroupSlug)', { modelGroupSlug: `%${cleanModelGroup}%` })
-        .groupBy('car.model')
-        .orderBy('car.model', 'ASC')
+        .orderBy('car.year', 'ASC')
         .getRawMany();
 
-      return cars.map((c: { name: string; minYear: number | null; maxYear: number | null }) => {
-        let nameWithYears = c.name;
-        const minYear = c.minYear && c.minYear > 1000 ? c.minYear : null;
-        const maxYear = c.maxYear && c.maxYear > 1000 ? c.maxYear : null;
-        if (minYear && maxYear) {
-          if (minYear === maxYear) {
-            nameWithYears = `${c.name} (${minYear})`;
-          } else {
-            nameWithYears = `${c.name} (${minYear} - ${maxYear})`;
-          }
-        } else if (minYear) {
-          nameWithYears = `${c.name} (${minYear})`;
-        }
-        return {
-          name: nameWithYears,
-          slug: c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, ''),
-        };
-      });
+      return cars.map((c: { year: number }) => ({
+        name: String(c.year),
+        slug: String(c.year),
+      }));
     } catch (error) {
       this.logger.error(`Failed to get models by manufacturer and model group: ${(error as Error).message}`);
       return [];

@@ -74,8 +74,9 @@ export const Hero: React.FC<HeroProps> = ({
       if (man) filters.manufacturer_slug = man.slug;
       const mg = modelGroups.find(mg => mg.name === selectedModel || mg.slug === selectedModel);
       if (man && mg) filters.model_group_slug = mg.slug;
-      const mod = models.find(m => m.name === selectedGeneration || m.slug === selectedGeneration);
-      if (man && mg && mod) filters.model_slug = mod.slug;
+      if (selectedGeneration) {
+        filters.year = parseInt(selectedGeneration, 10);
+      }
       onEncarFilterChange(filters);
     }
 

@@ -134,6 +134,7 @@ export interface ListVehiclesParams {
   price_from?: number;
   price_to?: number;
   search?: string;
+  year?: number;
 }
 
 export interface ListVehiclesResult {
@@ -235,6 +236,7 @@ export async function listVehicles(params: ListVehiclesParams = {}): Promise<Lis
   if (params.price_from) searchParams.set('priceFrom', String(params.price_from));
   if (params.price_to) searchParams.set('priceTo', String(params.price_to));
   if (params.search) searchParams.set('search', params.search);
+  if (params.year) searchParams.set('year', String(params.year));
 
   const res = await fetch(`${API_URL}/search?${searchParams.toString()}`);
   if (!res.ok) throw new Error(`Search failed: ${res.status}`);

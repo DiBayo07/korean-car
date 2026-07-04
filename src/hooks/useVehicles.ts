@@ -13,6 +13,7 @@ export interface UseVehiclesFilters {
   price_to?: number;
   search?: string;
   limit?: number;
+  year?: number;
 }
 
 export interface UseVehiclesResult {
@@ -111,6 +112,7 @@ export function useVehicles(initialFilters: UseVehiclesFilters = {}): UseVehicle
         price_from: currentFilters.price_from,
         price_to: currentFilters.price_to,
         search: currentFilters.search,
+        year: currentFilters.year,
       });
 
       if (currentPage === 1) {
