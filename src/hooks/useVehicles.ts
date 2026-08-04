@@ -40,7 +40,7 @@ export interface UseVehiclesResult {
 }
 
 export function useVehicles(initialFilters: UseVehiclesFilters = {}): UseVehiclesResult {
-  const [filters, setFilters] = useState<UseVehiclesFilters>({ limit: 50, ...initialFilters });
+  const [filters, setFilters] = useState<UseVehiclesFilters>({ limit: 20, ...initialFilters });
   const [vehicles, setVehicles] = useState<EncarVehicle[]>([]);
   const [total, setTotal] = useState(0);
   const [page, setPage] = useState(1);
@@ -101,7 +101,7 @@ export function useVehicles(initialFilters: UseVehiclesFilters = {}): UseVehicle
 
     try {
       const result = await listVehicles({
-        limit: currentFilters.limit || 50,
+        limit: currentFilters.limit || 20,
         page: currentPage,
         manufacturer_slug: currentFilters.manufacturer_slug,
         model_group_slug: currentFilters.model_group_slug,
@@ -151,7 +151,7 @@ export function useVehicles(initialFilters: UseVehiclesFilters = {}): UseVehicle
 
   const updateFilters = useCallback((newFilters: UseVehiclesFilters, overwrite = false) => {
     if (overwrite) {
-      setFilters({ limit: 50, ...newFilters });
+      setFilters({ limit: 20, ...newFilters });
     } else {
       setFilters(prev => ({ ...prev, ...newFilters }));
     }

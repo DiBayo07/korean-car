@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, lazy, Suspense } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Header } from './components/Header';
 import { Hero } from './components/Hero';
@@ -6,8 +6,8 @@ import { CarsSection } from './components/CarsSection';
 import { ContactSection } from './components/ContactSection';
 import { Footer } from './components/Footer';
 
-import { CarsPage } from './pages/CarsPage';
-import { CarDetailsPage } from './pages/CarDetailsPage';
+const CarsPage = lazy(() => import('./pages/CarsPage').then(module => ({ default: module.CarsPage })));
+const CarDetailsPage = lazy(() => import('./pages/CarDetailsPage').then(module => ({ default: module.CarDetailsPage })));
 import { useVehicles } from './hooks/useVehicles';
 import type { UseVehiclesFilters } from './hooks/useVehicles';
 import type { Vehicle } from './lib/api';
@@ -33,7 +33,7 @@ function App() {
     models, modelsLoading,
     fetchModelGroups, fetchModels,
     hasMore, loadMore,
-  } = useVehicles({ limit: 50 });
+  } = useVehicles({ limit: 20 });
   
   // Convert EncarVehicle[] to Vehicle[] for compatibility with existing components
   const vehicles = encarVehicles as unknown as Vehicle[];
@@ -249,31 +249,37 @@ function App() {
         onHomeClick={clearSearch}
       />
 
-      <Routes>
-        <Route path="/korean-car/" element={homePageElement} />
-        <Route path="/korean-car/cars" element={
-          <CarsPage
-            vehicles={encarVehicles}
-            t={t}
-            lang={lang}
-            loading={loading}
-            hasMore={hasMore}
-            loadMore={loadMore}
-            manufacturers={manufacturers}
-            manufacturersLoading={manufacturersLoading}
-            modelGroups={modelGroups}
-            modelGroupsLoading={modelGroupsLoading}
-            models={models}
-            modelsLoading={modelsLoading}
-            fetchModelGroups={fetchModelGroups}
-            fetchModels={fetchModels}
-            setFilters={setEncarFilters}
-          />
-        } />
-        <Route path="/korean-car/car/:id" element={<CarDetailsPage t={t} lang={lang} />} />
-        {/* Fallback to home */}
-        <Route path="*" element={homePageElement} />
-      </Routes>
+      <Suspense fallback={
+        <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center text-slate-400 gap-3">
+          <div className="w-10 h-10 rounded-full border-4 border-t-kg-gold border-slate-800 animate-spin" />
+        </div>
+      }>
+        <Routes>
+          <Route path="/korean-car/" element={homePageElement} />
+          <Route path="/korean-car/cars" element={
+            <CarsPage
+              vehicles={encarVehicles}
+              t={t}
+              lang={lang}
+              loading={loading}
+              hasMore={hasMore}
+              loadMore={loadMore}
+              manufacturers={manufacturers}
+              manufacturersLoading={manufacturersLoading}
+              modelGroups={modelGroups}
+              modelGroupsLoading={modelGroupsLoading}
+              models={models}
+              modelsLoading={modelsLoading}
+              fetchModelGroups={fetchModelGroups}
+              fetchModels={fetchModels}
+              setFilters={setEncarFilters}
+            />
+          } />
+          <Route path="/korean-car/car/:id" element={<CarDetailsPage t={t} lang={lang} />} />
+          {/* Fallback to home */}
+          <Route path="*" element={homePageElement} />
+        </Routes>
+      </Suspense>
 
       <Footer
         t={t}

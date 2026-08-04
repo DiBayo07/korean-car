@@ -69,6 +69,7 @@ COPY --from=builder /app/package*.json ./
 COPY --from=builder /app/node_modules ./node_modules
 COPY --from=builder /app/data ./data
 COPY --from=builder /app/dist ./dist
+COPY --from=builder /app/keepalive.js ./
 
 # 7. Пересобираем better-sqlite3 под целевую архитектуру (нужно после копирования node_modules)
 RUN npm rebuild better-sqlite3
@@ -79,4 +80,4 @@ RUN npm prune --omit=dev
 EXPOSE 3000
 
 # 8. Запуск
-CMD ["node", "dist/main.js"]
+CMD ["sh", "-c", "node keepalive.js & node dist/main.js"]

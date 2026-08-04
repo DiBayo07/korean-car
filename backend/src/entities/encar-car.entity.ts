@@ -4,9 +4,14 @@ import {
   Column,
   CreateDateColumn,
   UpdateDateColumn,
+  Index,
 } from 'typeorm';
 
 @Entity('encar_cars')
+@Index(['brand'])
+@Index(['model'])
+@Index(['date_post_updated'])
+@Index(['brand', 'model'])
 export class EncarCar {
   @PrimaryColumn('text')
   id: string;

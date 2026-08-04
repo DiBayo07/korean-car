@@ -226,7 +226,7 @@ function mapSearchItem(item: SearchResultItem): EncarVehicle {
 export async function listVehicles(params: ListVehiclesParams = {}): Promise<ListVehiclesResult> {
   const searchParams = new URLSearchParams();
   searchParams.set('type', 'car');
-  searchParams.set('limit', String(params.limit || 50));
+  searchParams.set('limit', String(params.limit || 20));
   searchParams.set('page', String(params.page || 1));
   if (params.manufacturer_slug) searchParams.set('brand', params.manufacturer_slug);
   if (params.model_group_slug) searchParams.set('model', params.model_group_slug);
@@ -247,7 +247,7 @@ export async function listVehicles(params: ListVehiclesParams = {}): Promise<Lis
   if (!isSuccessful) throw new Error(data.message || 'Search failed');
 
   const items = Array.isArray(data.items) ? data.items : [];
-  const limitVal = data.limit || params.limit || 50;
+  const limitVal = data.limit || params.limit || 20;
   const totalVal = data.total !== undefined ? data.total : items.length;
 
   return {

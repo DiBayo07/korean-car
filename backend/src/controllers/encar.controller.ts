@@ -1,4 +1,5 @@
-import { Controller, Get, Post, Param, Query, Logger } from '@nestjs/common';
+import { Controller, Get, Post, Param, Query, Logger, UseInterceptors } from '@nestjs/common';
+import { CacheInterceptor } from '@nestjs/cache-manager';
 import { ItemService, SearchService } from '../services/encar-api.service';
 import { DatabaseService } from '../services/database.service';
 import type { SearchQuery } from '../types/encar.types';
@@ -44,6 +45,7 @@ export class CatalogController {
 }
 
 @Controller('api')
+@UseInterceptors(CacheInterceptor)
 export class SearchController {
   private readonly logger = new Logger(SearchController.name);
 

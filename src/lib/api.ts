@@ -91,7 +91,7 @@ function mapSearchItemToVehicle(item: SearchItem, vehicleType: 'car' | 'bike'): 
 async function fetchSearch(type: 'car' | 'moto', filters: Record<string, string | number> = {}): Promise<SearchItem[]> {
   const params = new URLSearchParams({
     type,
-    limit: '50',
+    limit: '20',
     page: '1',
     ...Object.fromEntries(
       Object.entries(filters).map(([k, v]) => [k, String(v)]),

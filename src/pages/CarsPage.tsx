@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Search, Calendar, Gauge, DollarSign, SlidersHorizontal } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { translateBrandName, getFullImageUrl } from '../api/encarApi';
+import { useDebounce } from '../hooks/useDebounce';
 import type { CarapisManufacturer, CarapisModelGroup, CarapisModel } from '../api/encarApi';
 import type { EncarVehicle } from '../api/encarApi';
 import type { Language, TranslationDict } from '../lib/translations';
@@ -23,7 +24,7 @@ interface CarsPageProps {
   modelsLoading: boolean;
   fetchModelGroups: (slug: string) => void;
   fetchModels: (manSlug: string, modelGroupSlug: string) => void;
-  setFilters: (f: any) => void;
+  setFilters: (f: any, overwrite?: boolean) => void;
 }
 
 export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, hasMore, loadMore, manufacturers, manufacturersLoading, modelGroups, modelGroupsLoading, models, modelsLoading, fetchModelGroups, fetchModels, setFilters }) => {
@@ -36,6 +37,14 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, 
   const [yearTo, setYearTo] = useState('');
   const [priceFrom, setPriceFrom] = useState('');
   const [priceTo, setPriceTo] = useState('');
+
+  const debouncedSearchText = useDebounce(searchText, 500);
+
+  useEffect(() => {
+    setFilters({
+      search: debouncedSearchText.trim() || undefined
+    });
+  }, [debouncedSearchText]);
 
   const sortedManufacturers = [...manufacturers]
     .map(m => ({ ...m, translatedName: translateBrandName(m.name) }))
@@ -51,7 +60,7 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, 
     setYearTo('');
     setPriceFrom('');
     setPriceTo('');
-    setFilters({});
+    setFilters({}, true);
   };
 
   return (
@@ -274,7 +283,7 @@ export const CarsPage: React.FC<CarsPageProps> = ({ vehicles, t, lang, loading, 
                     setYearTo('');
                     setPriceFrom('');
                     setPriceTo('');
-                    setFilters({});
+                    setFilters({}, true);
                     setSelectedBrand('');
                     setSelectedModel('');
                     setSelectedGeneration('');
